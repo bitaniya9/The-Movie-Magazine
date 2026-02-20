@@ -4,8 +4,10 @@ const UserRoutes = require("./src/routes/User.routes");
 const MovieRoutes = require("./src/routes/movie.routes");
 const ReviewRoutes = require("./src/routes/review.routes");
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("/api", UserRoutes);
 app.use("/api", MovieRoutes);
