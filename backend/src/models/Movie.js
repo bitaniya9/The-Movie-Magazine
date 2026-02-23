@@ -11,6 +11,7 @@ const MovieSchema = new mongoose.Schema({
       "drama",
       "documentary",
       "family",
+      "adventure",
       "sci-fi",
       "horror",
       "thriller",

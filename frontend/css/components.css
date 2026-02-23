@@ -28,6 +28,11 @@ h3 {
 a {
   color: #b0b0b0;
 }
+.error {
+  color: red;
+  font-size: smaller;
+  margin-top: 10px;
+}
 a:hover {
   cursor: pointer;
   color: #ff7043;

@@ -23,7 +23,7 @@ export function getToken() {
   return localStorage.getItem("token");
 }
 
-export async function SignUp(data) {
+export async function signUp(data) {
   const response = await fetch(`${BASE_URL}/users/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -33,5 +33,6 @@ export async function SignUp(data) {
   if (!response.ok) {
     throw new Error(result.message || "Sign up failed");
   }
+  localStorage.setItem("token", result.token);
   return result;
 }
