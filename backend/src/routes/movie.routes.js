@@ -10,6 +10,7 @@ router.post(
   MovieController.createMovie,
 );
 router.get("/v1/movies", MovieController.getAllMovies);
+router.get("/v1/movies/:category", MovieController.getMoviesByCategory);
 router.put(
   "/v1/movies/:id",
   authMiddleware,

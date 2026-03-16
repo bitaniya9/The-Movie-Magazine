@@ -30,6 +30,9 @@ class MovieServices {
       runValidators: true,
     });
   }
+  async getMoviesByCategory(category) {
+    return await Movie.find({ category: category });
+  }
   async deleteMovie(movieId) {
     return await Movie.findByIdAndDelete(movieId);
   }

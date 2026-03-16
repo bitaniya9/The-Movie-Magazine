@@ -34,6 +34,16 @@ class MovieController {
       response.status(403).json({ success: false, message: error.message });
     }
   }
+  async getMoviesByCategory(request, response) {
+    try {
+      const movies = await MovieServices.getMoviesByCategory(
+        request.params.category,
+      );
+      response.status(200).json({ success: true, data: movies });
+    } catch (error) {
+      response.status(400).json({ message: error.message });
+    }
+  }
   async deleteMovie(request, response) {
     try {
       await MovieServices.deleteMovie(request.params.id);

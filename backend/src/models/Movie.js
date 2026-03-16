@@ -16,6 +16,7 @@ const MovieSchema = new mongoose.Schema({
       "horror",
       "thriller",
     ],
+
     required: true,
   },
   posterImgUrl: { type: String },
@@ -25,7 +26,18 @@ const MovieSchema = new mongoose.Schema({
   director: { type: String, required: true },
 
   cast: [{ name: { type: String, required: true }, role: { type: String } }],
-
+  category: {
+    type: [String],
+    enum: [
+      "Trending",
+      "Family",
+      "Popular",
+      "Kids",
+      "Adventure",
+      "Classics",
+      "Comedy",
+    ],
+  },
   releaseYear: { type: Number, required: true },
 
   averageRating: { type: Number, default: 0 },

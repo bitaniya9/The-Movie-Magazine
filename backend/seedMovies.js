@@ -1,12 +1,15 @@
 require("dotenv").config();
-const Movie = require("./src/models/Movie.js"); // adjust path
-const connectDB = require("./src/config/db.js");
+const Movie = require("./src/models/Movie");
+const connectDB = require("./src/config/db");
+
 const seedMovies = async () => {
   try {
     await connectDB();
+
     const movies = [
       {
         title: "Toy Story",
+        category: ["Trending", "Family", "Kids", "Classics"],
         genre: ["family", "comedy"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
@@ -19,8 +22,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 1995,
       },
+
       {
         title: "Finding Nemo",
+        category: ["Trending", "Family", "Kids", "Adventure"],
         genre: ["family", "adventure"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
@@ -33,8 +38,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 2003,
       },
+
       {
         title: "The Lion King",
+        category: ["Popular", "Family", "Classics"],
         genre: ["family", "drama"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/2bXbqYdUdNVa8VIWXVfclP2ICtT.jpg",
@@ -46,8 +53,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 1994,
       },
+
       {
         title: "Frozen",
+        category: ["Trending", "Popular", "Kids"],
         genre: ["family", "romance"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/kgwjIb2JDHRhNk13lmSxiClFjVk.jpg",
@@ -59,8 +68,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 2013,
       },
+
       {
         title: "Shrek",
+        category: ["Popular", "Family", "Comedy"],
         genre: ["family", "comedy"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg",
@@ -73,8 +84,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 2001,
       },
+
       {
         title: "Paddington",
+        category: ["Family", "Kids"],
         genre: ["family", "comedy"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/7F8YlUeE3bJkL6r0R5K9g0UQ8hP.jpg",
@@ -86,44 +99,10 @@ const seedMovies = async () => {
         ],
         releaseYear: 2014,
       },
-      {
-        title: "Paddington 2",
-        genre: ["family", "comedy"],
-        posterImgUrl:
-          "https://image.tmdb.org/t/p/w500/1X7vow16X7CnCoexXh4H4F2yDJv.jpg",
-        description: "Paddington gets into trouble while searching for a gift.",
-        director: "Paul King",
-        cast: [
-          { name: "Ben Whishaw", role: "Paddington (voice)" },
-          { name: "Hugh Grant", role: "Phoenix Buchanan" },
-        ],
-        releaseYear: 2017,
-      },
-      {
-        title: "Matilda the Musical",
-        genre: ["family", "drama"],
-        posterImgUrl:
-          "https://image.tmdb.org/t/p/w500/ga8R3OiH3K7J3sL9L5XkYh7C0R.jpg",
-        description: "A gifted girl uses her powers to change her life.",
-        director: "Matthew Warchus",
-        cast: [
-          { name: "Alisha Weir", role: "Matilda" },
-          { name: "Emma Thompson", role: "Miss Trunchbull" },
-        ],
-        releaseYear: 2022,
-      },
-      {
-        title: "Encanto",
-        genre: ["family", "drama"],
-        posterImgUrl:
-          "https://image.tmdb.org/t/p/w500/4j0PNHkMr5ax3IA8tjtxcmPU3QT.jpg",
-        description: "A magical family faces challenges when powers fade.",
-        director: "Jared Bush",
-        cast: [{ name: "Stephanie Beatriz", role: "Mirabel (voice)" }],
-        releaseYear: 2021,
-      },
+
       {
         title: "Coco",
+        category: ["Trending", "Family", "Kids"],
         genre: ["family", "drama"],
         posterImgUrl:
           "https://image.tmdb.org/t/p/w500/eKi8dIrr8voobbaGzDpe8w0PVbC.jpg",
@@ -135,75 +114,42 @@ const seedMovies = async () => {
 
       {
         title: "Moana",
+        category: ["Trending", "Adventure", "Kids"],
         genre: ["family", "adventure"],
+        posterImgUrl:
+          "https://image.tmdb.org/t/p/w500/4JeeYF2U7RUrhAjM1K9h4sE4P7.jpg",
+        description: "A young girl sails the ocean to save her island.",
         director: "Ron Clements",
         cast: [{ name: "Auli'i Cravalho", role: "Moana (voice)" }],
         releaseYear: 2016,
       },
+
       {
         title: "Zootopia",
+        category: ["Popular", "Family", "Kids"],
         genre: ["family", "comedy"],
+        posterImgUrl:
+          "https://image.tmdb.org/t/p/w500/sM33SANp9z6rXW8Itn7NnG1GOEs.jpg",
+        description: "A bunny cop and fox solve a mysterious case.",
         director: "Byron Howard",
         cast: [{ name: "Ginnifer Goodwin", role: "Judy (voice)" }],
         releaseYear: 2016,
       },
-      {
-        title: "Up",
-        genre: ["family", "drama"],
-        director: "Pete Docter",
-        cast: [{ name: "Ed Asner", role: "Carl (voice)" }],
-        releaseYear: 2009,
-      },
+
       {
         title: "Inside Out",
+        category: ["Popular", "Family"],
         genre: ["family", "drama"],
+        posterImgUrl:
+          "https://image.tmdb.org/t/p/w500/lRHE0vzf3oYJrhbsHXjIkF4Tl5A.jpg",
+        description:
+          "The emotions inside a young girl's mind struggle to guide her.",
         director: "Pete Docter",
         cast: [{ name: "Amy Poehler", role: "Joy (voice)" }],
         releaseYear: 2015,
       },
-      {
-        title: "The Incredibles",
-        genre: ["family", "action"],
-        director: "Brad Bird",
-        cast: [{ name: "Craig T. Nelson", role: "Mr. Incredible (voice)" }],
-        releaseYear: 2004,
-      },
-      {
-        title: "The Incredibles 2",
-        genre: ["family", "action"],
-        director: "Brad Bird",
-        cast: [{ name: "Craig T. Nelson", role: "Mr. Incredible (voice)" }],
-        releaseYear: 2018,
-      },
-      {
-        title: "Despicable Me",
-        genre: ["family", "comedy"],
-        director: "Pierre Coffin",
-        cast: [{ name: "Steve Carell", role: "Gru (voice)" }],
-        releaseYear: 2010,
-      },
-      {
-        title: "Minions",
-        genre: ["family", "comedy"],
-        director: "Kyle Balda",
-        cast: [{ name: "Pierre Coffin", role: "Minions (voice)" }],
-        releaseYear: 2015,
-      },
-      {
-        title: "Hotel Transylvania",
-        genre: ["family", "comedy"],
-        director: "Genndy Tartakovsky",
-        cast: [{ name: "Adam Sandler", role: "Dracula (voice)" }],
-        releaseYear: 2012,
-      },
-      {
-        title: "Night at the Museum",
-        genre: ["family", "comedy"],
-        director: "Shawn Levy",
-        cast: [{ name: "Ben Stiller", role: "Larry" }],
-        releaseYear: 2006,
-      },
     ];
+
     await Movie.deleteMany();
     console.log("Old movies removed");
 
