@@ -1,0 +1,37 @@
+/* grid,navbar,footer */
+* {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #121212;
+  font-family: Arial, sans-serif;
+  color: #e0e0e0;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+/* a:hover {
+  color: #ff7043;
+}
+/* .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+} */
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

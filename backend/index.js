@@ -5,6 +5,7 @@ const MovieRoutes = require("./src/routes/movie.routes");
 const ReviewRoutes = require("./src/routes/review.routes");
 const express = require("express");
 const cors = require("cors");
+const API_KEY = process.env.TMDB_API_KEY;
 
 const app = express();
 app.use(cors());
