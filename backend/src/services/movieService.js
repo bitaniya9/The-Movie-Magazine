@@ -43,6 +43,6 @@ const getMovies = async (filter = {}) => {
   return await Movie.find(filter);
 };
 module.exports = {
-  syncCategory,
+  syncAllCategory,
   getMovies,
 };
