@@ -4,12 +4,12 @@ const API = axios.create({
   baseURL: "http://localhost:3000/api/v1", // Note the v1 to match your router!
 });
 
-export const fetchTrendingMovies = async () => {
+export const fetchMoviesByCategory = async (category) => {
   try {
-    const response = await API.get("/movies?category=Trending");
+    const response = await API.get(`/movies?category=${category}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching movies:", error.message);
+    console.error(`Error fetching ${category} movies: `, error.message);
     return [];
   }
 };

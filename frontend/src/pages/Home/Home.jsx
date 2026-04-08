@@ -1,119 +1,95 @@
 import React, { useState, useEffect } from "react";
-import { fetchTrendingMovies } from "../../services/api"; // Path to your api.js
-import { Search, Star, Play, Info } from "lucide-react";
+import { fetchMoviesByCategory } from "../../services/api";
+// import { Star } from "lucide-react";
+import MovieCard from "../../components/MovieCard/MovieCard";
 import "./Home.css";
 
 const Home = () => {
-  const [movies, setMovies] = useState([]);
+  const [trending, setTrending] = useState([]);
+  const [topRated, setTopRated] = useState([]);
+  const [kids, setKids] = useState([]);
+  const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getMovies = async () => {
-      const data = await fetchTrendingMovies();
-      setMovies(data);
-      setLoading(false);
+    const loadAllContent = async () => {
+      try {
+        const [trendingData, topData, kidsData, seriesData] = await Promise.all(
+          [
+            fetchMoviesByCategory("Trending"),
+            fetchMoviesByCategory("TopRated"),
+            fetchMoviesByCategory("Kids"),
+            fetchMoviesByCategory("Series"),
+          ],
+        );
+        setTrending(trendingData);
+        setTopRated(topData);
+        setKids(kidsData);
+        setSeries(seriesData);
+      } catch (error) {
+        console.log("Error loading movies:", error.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    getMovies();
+    loadAllContent();
   }, []);
 
   if (loading) return <div className="loading">Loading...</div>;
 
   // Use the first movie for the Hero section
-  const featured = movies[0] || {};
-
   return (
     <div className="page-container">
       <header className="hero">
         <div className="hero-overlay"></div>
         {/* Use posterImgUrl from your DB transformation! */}
-        <img src={featured.posterImgUrl} alt="Featured" className="hero-img" />
+        <img src={trending[0]?.posterImgUrl} alt="Hero" className="hero-img" />
 
         <div className="hero-content">
           <span className="badge">Featured Review</span>
-          <h2 className="hero-title">{featured.title}</h2>
+          <h2 className="hero-title">{trending[0]?.title}</h2>
 
-          <p className="hero-description">{featured.description}</p>
-
-          {/* <div className="button-group">
-            <button className="btn-primary">
-              <Play size={20} fill="black" /> Watch Trailer
-            </button> 
-            <button className="btn-secondary">
-              <Info size={20} /> Details
-            </button> 
-          </div> */}
+          <p className="hero-description">{trending[0]?.description}</p>
         </div>
       </header>
 
       <main className="main-content">
-        <h3>Trending Reviews</h3>
-        <div className="movie-grid">
-          {movies.map((movie) => (
-            <div key={movie._id} className="movie-card">
-              <div className="card-image-wrapper">
-                {/* Use the specific field names from your Backend transformMovie function */}
-                <img src={movie.posterImgUrl} alt={movie.title} />
-                <div className="rating-badge">
-                  <Star size={12} fill="gold" />{" "}
-                  {movie.averageRating?.toFixed(1)}
-                </div>
-              </div>
-              <div className="card-info">
-                <h4>{movie.title}</h4>
-                <p>
-                  {movie.releaseYear} • {movie.category?.[0]}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <section className="category-section">
+          <h3>Trending Now</h3>
+          <div className="movie-grid">
+            {trending.map((movie) => (
+              <MovieCard key={movie._id} movie={movie} />
+            ))}
+          </div>
+        </section>
+
+        <section className="category-section">
+          <h3>Top Rated</h3>
+          <div className="movie-grid">
+            {topRated.map((movie) => (
+              <MovieCard key={movie._id} movie={movie} />
+            ))}
+          </div>
+        </section>
+
+        <section className="category-section">
+          <h3>Series</h3>
+          <div className="movie-grid">
+            {series.map((movie) => (
+              <MovieCard key={movie._id} movie={movie} />
+            ))}
+          </div>
+        </section>
+
+        <section className="category-section">
+          <h3>Kids & Family</h3>
+          <div className="movie-grid">
+            {kids.map((movie) => (
+              <MovieCard key={movie._id} movie={movie} />
+            ))}
+          </div>
+        </section>
       </main>
-      <div>
-        <h3>Top Rated</h3>
-        <div className="movie-grid">
-          {movies.map((movie) => (
-            <div key={movie._id} className="movie-card">
-              <div className="card-image-wrapper">
-                {/* Use the specific field names from your Backend transformMovie function */}
-                <img src={movie.posterImgUrl} alt={movie.title} />
-                <div className="rating-badge">
-                  <Star size={12} fill="gold" />{" "}
-                  {movie.averageRating?.toFixed(1)}
-                </div>
-              </div>
-              <div className="card-info">
-                <h4>{movie.title}</h4>
-                <p>
-                  {movie.releaseYear} • {movie.category?.[0]}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h3>Series</h3>
-        <div className="movie-grid">
-          {movies.map((movie) => (
-            <div key={movie._id} className="movie-card">
-              <div className="card-image-wrapper">
-                {/* Use the specific field names from your Backend transformMovie function */}
-                <img src={movie.posterImgUrl} alt={movie.title} />
-                <div className="rating-badge">
-                  <Star size={12} fill="gold" />{" "}
-                  {movie.averageRating?.toFixed(1)}
-                </div>
-              </div>
-              <div className="card-info">
-                <h4>{movie.title}</h4>
-                <p>
-                  {movie.releaseYear} • {movie.category[0]}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

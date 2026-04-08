@@ -1,6 +1,8 @@
 const {
   fetchTrendingMovies,
-  fetchPopularMovies,
+  fetchTopRatedMovies,
+  fetchKidsMovies,
+  fetchSeries,
 } = require("../services/tmdbService");
 
 const getAllMovies = async (req, res) => {
@@ -11,18 +13,24 @@ const getAllMovies = async (req, res) => {
     // 1. Fetch from Service
     if (category === "Trending") {
       rawMovies = await fetchTrendingMovies();
-    } else {
-      rawMovies = await fetchPopularMovies();
+    } else if (category === "TopRated") {
+      rawMovies = await fetchTopRatedMovies();
+    } else if (category === "Kids") {
+      rawMovies = await fetchKidsMovies();
+    } else if (category === "Series") {
+      rawMovies = await fetchSeries();
+      console.log("SERIES RAW DATA SAMPLE:", rawMovies[0]);
     }
 
     // 2. Transform the data so React can read it easily
     const transformed = rawMovies.map((m) => ({
       _id: m.id,
-      title: m.title || m.name,
+      title: m.title || m.name || "Untitled",
       posterImgUrl: `https://image.tmdb.org/t/p/w500${m.poster_path}`,
-      releaseYear: (m.release_date || m.first_air_date || "").split("-")[0],
+      releaseYear:
+        (m.release_date || m.first_air_date || "").split("-")[0] || "N/A",
       averageRating: m.vote_average,
-      category: [category || "Popular"],
+      category: [category || "General"],
       description: m.overview,
     }));
 
