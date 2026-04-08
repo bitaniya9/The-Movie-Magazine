@@ -1,0 +1,237 @@
+/* Variables for easy updates */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* This is the most important line */
+}
+
+body,
+html {
+  width: 100%;
+  overflow-x: hidden; /* Prevents anything from accidentally poking out the side */
+}
+:root {
+  --bg-color: #020617;
+  --primary-red: #e11d48;
+  --text-main: #ffffff;
+  --text-dim: #94a3b8;
+  --card-bg: #0f172a;
+}
+
+.page-container {
+  /* background-color: var(--bg-color); */
+  /* color: var(--text-main); */
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+/* Navbar Styles */
+/* .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  box-sizing: border-box;
+} */
+
+/* .logo {
+  color: var(--primary-red);
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+} */
+/* 
+.nav-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+} */
+
+.search-container {
+  position: relative;
+}
+
+/* .search-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #334155;
+  color: white;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  border-radius: 99px;
+  outline: none;
+} */
+
+/* .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+} */
+
+/* Hero Section */
+
+.hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  opacity: 0.4;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  /* background: linear-gradient(to right, var(--bg-color), transparent); */
+  z-index: -1;
+}
+
+.hero-title {
+  font-size: 4rem;
+  margin: 0.5rem 0;
+  font-weight: 800;
+}
+
+/* Grid & Cards */
+.main-content {
+  padding: 1.2rem 1.2rem;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.movie-card {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-image-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 2/3;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rating-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: white;
+  color: black;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+h3 {
+  padding: 1rem;
+  margin: 1.2rem;
+  font-size: 2rem;
+  font-weight: 500;
+}
+.hero {
+  position: relative;
+  height: 80vh;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start; /* Center the entire content area */
+}
+
+.hero-img {
+  position: absolute;
+  padding-top: 1.2rem;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: 100%;
+  object-fit: cover; /* Ensures image fills the space without stretching */
+  z-index: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* A gradient makes the text readable regardless of the image color */
+
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  margin-left: 5%;
+  margin-bottom: 60px;
+  max-width: 650px; /* Keeps the description from being too wide */
+  text-align: left;
+  color: rgb(181, 180, 180);
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 4rem); /* Responsive font size */
+  font-weight: 500;
+  margin: 10px 0;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #e5e5e5;
+  margin-bottom: 20px;
+  /* Adds a limit to lines so it doesn't cover the whole screen */
+  display: -webkit-box;
+  /* -webkit-line-clamp: 3; */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.badge {
+  background-color: #e50914; /* Netflix Red style */
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
