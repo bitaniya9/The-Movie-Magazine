@@ -39,7 +39,7 @@ const Navbar = ({ setShowLogin }) => {
               onClick={() => setPage("Series")}
               className={page === "Series" ? "active" : ""}
             >
-              TV-series
+              TV
             </Link>
           </li>
 
