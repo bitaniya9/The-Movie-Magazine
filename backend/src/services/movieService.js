@@ -14,9 +14,10 @@ const transformMovie = (movie, categoryName) => ({
   director: "unknown",
   cast: [],
   category: [categoryName], // Now correctly scoped
-  releaseYear: movie.release_date
-    ? new Date(movie.release_date).getFullYear()
-    : "N/A",
+  releaseYear:
+    movie.release_date || movie.first_air_date
+      ? new Date(movie.release_date || movie.first_air_date).getFullYear()
+      : "N/A",
   averageRating: movie.vote_average,
   reviewCount: movie.vote_count,
   tmdbId: movie.id, // Highly recommended for tracking duplicates
@@ -30,19 +31,14 @@ const syncCategory = async (fetchFunction, categoryName) => {
     transformMovie(movie, categoryName),
   );
 
-  // 3. Use bulkWrite or parallel updates instead of insertMany + Loop
-  // This avoids duplicate key errors and is much faster
-  const syncPromises = transformedMovies.map((movie) =>
-    Movie.updateOne(
-      { title: movie.title }, // Better yet, use { tmdbId: movie.tmdbId }
+  const savePromises = transformedMovies.map(async (movie) => {
+    return await Movie.findOneAndUpdate(
+      { tmdbId: movie.tmdbId }, // Better yet, use { tmdbId: movie.tmdbId }
       { $set: movie },
-      { upsert: true },
-    ),
-  );
-
-  await Promise.all(syncPromises);
-  console.log(`Synced ${categoryName} category.`);
-  return transformedMovies;
+      { upsert: true, returnDocument: "after" },
+    );
+  });
+  return Promise.all(savePromises);
 };
 
 const syncAllMovies = async () => {

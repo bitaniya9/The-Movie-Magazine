@@ -6,7 +6,7 @@ const MovieRoutes = require("./src/routes/movieRoutes");
 const ReviewRoutes = require("./src/routes/review.routes");
 
 const cors = require("cors");
-const API_KEY = process.env.TMDB_API_KEY;
+// const API_KEY = process.env.TMDB_API_KEY;
 const { syncAllMovies } = require("./src/services/movieService");
 // const cron = require("node-cron");
 
@@ -16,7 +16,7 @@ app.use(express.json());
 app.use("/api", UserRoutes);
 app.use("/api", MovieRoutes);
 app.use("/api", ReviewRoutes);
-// connectDB();
+connectDB();
 
 // // Run immediately at startup
 syncAllMovies();
@@ -26,7 +26,7 @@ syncAllMovies();
 //   console.log("Syncing movies every 6 hours...");
 //   await syncAllMovies();
 // });
-console.log(API_KEY);
+// console.log(API_KEY);
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port: ${process.env.PORT}`);
 });

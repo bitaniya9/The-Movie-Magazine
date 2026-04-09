@@ -24,7 +24,7 @@ function Series() {
   return (
     <div>
       <main className="main-content">
-        <h2 className="section-title">Series</h2>
+        <h2 className="section-title">TV Shows</h2>
         <div className="movie-grid">
           {series.length > 0 ? (
             series.map((movie) => <MovieCard key={movie._id} movie={movie} />)

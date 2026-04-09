@@ -63,5 +63,28 @@ class UserService {
       token,
     };
   }
+
+  async addToWatchList(userId, movieId) {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { watchlist: movieId } },
+      { returnDocument: "after" },
+    ).populate("watchlist");
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+    return updatedUser.watchlist;
+  }
+  async getProfile(userId) {
+    const user = await User.findById(userId)
+      .populate("watchlist")
+      .select("-password")
+      .select("-role");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  }
 }
 module.exports = new UserService();

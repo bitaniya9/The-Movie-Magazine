@@ -1,0 +1,174 @@
+:root {
+  --primary-color: #e50914; /* Netflix Red */
+  --bg-color: #141414;
+  --card-bg: #1f1f1f;
+  --text-main: #ffffff;
+  --text-dim: #b3b3b3;
+}
+
+.profile-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 90px 30px;
+  color: var(--text-main);
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+/* Header Section */
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.profile-info-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  object-fit: cover;
+  background-color: var(--card-bg);
+}
+
+.profile-text h1 {
+  font-size: 20px; /* Smaller, professional heading */
+  font-weight: 650;
+  margin-bottom: 4px;
+}
+
+.member-since {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+.edit-btn {
+  margin-left: auto;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 100px; /* Pill shape */
+  font-size: 13px;
+  cursor: pointer;
+}
+.dot {
+  font-size: 10px;
+}
+/* Movie Grid - Responsive */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+/* 
+
+
+/* Loading & Error States */
+.loading,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 1.2rem;
+  color: var(--text-dim);
+}
+
+.error-container button {
+  margin-top: 20px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .profile-info-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .profile-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+  }
+}
+.profile-meta {
+  font-size: 13px;
+  color: #999;
+  display: flex;
+  gap: 8px;
+}
+
+/* Navigation Tabs */
+.profile-nav {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #ebebeb;
+  margin-bottom: 24px;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  padding: 12px 0;
+  font-size: 14px;
+  color: #f3f2f2;
+  cursor: pointer;
+  position: relative;
+}
+
+.nav-item.active {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* The underline bar under active tab */
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+/* Content Area */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(140px, 1fr)
+  ); /* Smaller cards */
+  gap: 16px;
+}
+
+.empty-msg {
+  font-size: 14px;
+  color: #999;
+  padding: 40px 0;
+  text-align: center;
+}
