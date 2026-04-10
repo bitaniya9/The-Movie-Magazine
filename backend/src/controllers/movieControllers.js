@@ -4,6 +4,7 @@ const {
   fetchKidsMovies,
   fetchSeries,
 } = require("../services/tmdbService");
+const { getMovieById } = require("../services/movieService");
 
 const getAllMovies = async (req, res) => {
   try {
@@ -41,6 +42,16 @@ const getAllMovies = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch movies" });
   }
 };
+const getMoviesById = async (request, response) => {
+  try {
+    const { id } = request.params;
+    const movie = await getMovieById(id);
+    response.status(200).json({ movie });
+  } catch (error) {
+    response.status(500).json({ message: error.message });
+    console.log("Searching for movie with TMDB ID:", id);
+  }
+};
 
 // 4. Export it so the Router can see it
-module.exports = { getAllMovies };
+module.exports = { getAllMovies, getMoviesById };

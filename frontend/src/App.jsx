@@ -7,6 +7,7 @@ import Home from "./pages/Home/Home";
 import Movies from "./pages/Movies/Movies";
 import KidsShows from "./pages/KidsShows/KidsShows";
 import Profile from "./pages/Profile/Profile";
+import Details from "./pages/Details/Details";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -21,6 +22,7 @@ function App() {
           <Route path="/series" element={<Series />} />
           <Route path="/kidsShows" element={<KidsShows />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/movie/:id" element={<Details />} />
         </Routes>
       </div>
     </>

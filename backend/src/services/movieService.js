@@ -55,8 +55,13 @@ const syncAllMovies = async () => {
 const getMovies = async (filter = {}) => {
   return await Movie.find(filter);
 };
+const getMovieById = async (tmdbId) => {
+  const movie = await Movie.findOne({ tmdbId: tmdbId });
+  return movie;
+};
 
 module.exports = {
   syncAllMovies,
   getMovies,
+  getMovieById,
 };

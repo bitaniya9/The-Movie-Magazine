@@ -45,3 +45,8 @@
   align-items: center;
   gap: 4px;
 }
+.movie-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}

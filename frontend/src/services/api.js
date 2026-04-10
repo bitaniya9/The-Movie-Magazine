@@ -46,5 +46,13 @@ export const fetchUserInfo = async () => {
     throw error;
   }
 };
+export const fetchMovieById = async (id) => {
+  try {
+    const response = await API.get(`/movie/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log("Error getting movie details", error.message);
+  }
+};
 // You can add more later:
 // export const fetchPopular = () => API.get("/movies?category=Popular");
