@@ -19,6 +19,7 @@ export const loginUser = async (credentials) => {
     return response.data;
   } catch (error) {
     console.log("Error logging in", error.message);
+    throw error;
   }
 };
 export const signUser = async (data) => {
@@ -27,6 +28,7 @@ export const signUser = async (data) => {
     return response.data;
   } catch (error) {
     console.log("Error signing in", error.message);
+    throw error;
   }
 };
 export const fetchUserInfo = async () => {

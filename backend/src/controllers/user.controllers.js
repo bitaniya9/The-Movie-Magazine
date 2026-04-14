@@ -10,7 +10,10 @@ class UserController {
       const { token, user } = await UserService.signUp(validatedData);
       response.status(201).json({ token, user });
     } catch (error) {
-      response.status(400).json({ message: error.message });
+      if (error.errors) {
+        return response.status(400).json({ message: error.errors[0].message });
+      }
+      response.status(401).json({ message: error.message });
     }
   }
   async login(request, response) {
@@ -19,7 +22,7 @@ class UserController {
       const { token, user } = await UserService.login(validatedData);
       response.status(200).json({ token, user });
     } catch (error) {
-      response.status(400).json({ message: error.message });
+      response.status(401).json({ message: error.message });
     }
   }
   async handleAddWatchlist(request, response) {

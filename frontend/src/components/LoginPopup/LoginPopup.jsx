@@ -5,6 +5,7 @@ import "./LoginPopup.css";
 
 function LoginPopup({ setShowLogin }) {
   const [currState, setCurrState] = useState("Login");
+  const [errorMsg, setErrorMsg] = useState("");
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -17,6 +18,8 @@ function LoginPopup({ setShowLogin }) {
   };
   const onLogin = async (event) => {
     event.preventDefault();
+    setErrorMsg("");
+
     try {
       let response;
       if (currState === "Login") {
@@ -27,11 +30,25 @@ function LoginPopup({ setShowLogin }) {
       } else {
         response = await signUser(data);
       }
+
+      // Success!
       localStorage.setItem("token", response.token);
       setShowLogin(false);
-      window.location.reaload();
+      window.location.reload();
     } catch (error) {
-      console.log("Error:", error.message);
+      let message = error.response?.data?.message || "Something went wrong";
+
+      if (typeof message === "string" && message.startsWith("[")) {
+        try {
+          const parsed = JSON.parse(message);
+          message = parsed[0]?.message || message;
+        } catch (e) {
+          // If it looks like JSON but isn't, just leave it as is
+        }
+      }
+
+      setErrorMsg(message);
+      console.log("Error Details:", error.message);
     }
   };
   return (
@@ -44,49 +61,54 @@ function LoginPopup({ setShowLogin }) {
             src="/assets/x_icon.png"
             alt="close"
           />
-          <div className="login-popup-inputs">
-            {currState === "Sign up" && (
-              <input
-                name="name"
-                onChange={onChangleHandler}
-                value={data.name}
-                type="text"
-                placeholder="Your Name"
-                required
-              />
-            )}
-            <input
-              name="email"
-              onChange={onChangleHandler}
-              value={data.email}
-              type="email"
-              placeholder="Your email"
-              required
-            />
-            <input
-              name="password"
-              type="password"
-              onChange={onChangleHandler}
-              value={data.password}
-              placeholder="Password"
-              required
-            />
-          </div>
-          <button type="submit">
-            {currState === "Sign up" ? "Create Account" : "Login"}
-          </button>
-          {currState === "Login" ? (
-            <p>
-              Create a new account?
-              <span onClick={() => setCurrState("Sign up")}>Click here</span>
-            </p>
-          ) : (
-            <p>
-              Already have an account?
-              <span onClick={() => setCurrState("Login")}>Login here</span>
-            </p>
-          )}
         </div>
+        {errorMsg && (
+          <p className="error-text" style={{ color: "red", fontSize: "12px" }}>
+            {errorMsg}
+          </p>
+        )}
+        <div className="login-popup-inputs">
+          {currState === "Sign up" && (
+            <input
+              name="name"
+              onChange={onChangleHandler}
+              value={data.name}
+              type="text"
+              placeholder="Your Name"
+              required
+            />
+          )}
+          <input
+            name="email"
+            onChange={onChangleHandler}
+            value={data.email}
+            type="email"
+            placeholder="Your email"
+            required
+          />
+          <input
+            name="password"
+            type="password"
+            onChange={onChangleHandler}
+            value={data.password}
+            placeholder="Password"
+            required
+          />
+        </div>
+        <button type="submit">
+          {currState === "Sign up" ? "Create Account" : "Login"}
+        </button>
+        {currState === "Login" ? (
+          <p>
+            Create a new account?
+            <span onClick={() => setCurrState("Sign up")}>Click here</span>
+          </p>
+        ) : (
+          <p>
+            Already have an account?
+            <span onClick={() => setCurrState("Login")}>Login here</span>
+          </p>
+        )}
       </form>
     </div>
   );
