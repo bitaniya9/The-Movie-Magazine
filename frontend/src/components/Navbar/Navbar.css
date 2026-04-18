@@ -106,3 +106,20 @@
     display: none;
   }
 }
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Space between search and profile */
+}
+
+.profile-icon {
+  font-size: 28px; /* Adjust size to match your theme */
+  color: red;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.profile-icon:hover {
+  color: #ff4d4d; /* Or your hover color */
+}

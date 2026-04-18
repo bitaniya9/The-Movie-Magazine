@@ -11,11 +11,12 @@ import Details from "./pages/Details/Details";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
+  const [token, setToken] = useState(null);
   return (
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
       <div className="app">
-        <Navbar setShowLogin={setShowLogin} />
+        <Navbar setShowLogin={setShowLogin} token={token} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />

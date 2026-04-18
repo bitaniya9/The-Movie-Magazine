@@ -10,9 +10,6 @@ class UserController {
       const { token, user } = await UserService.signUp(validatedData);
       response.status(201).json({ token, user });
     } catch (error) {
-      if (error.errors) {
-        return response.status(400).json({ message: error.errors[0].message });
-      }
       response.status(401).json({ message: error.message });
     }
   }
