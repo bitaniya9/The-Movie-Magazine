@@ -150,10 +150,23 @@ h3 {
   padding-top: 1.2rem;
   top: 0;
   left: 0;
-  width: 80%;
+  width: 100%;
   height: 100%;
   object-fit: cover; /* Ensures image fills the space without stretching */
   z-index: 1;
+}
+.fade-in {
+  animation: fadeInEffect 1.5s ease-in-out;
+}
+@keyframes fadeInEffect {
+  from {
+    opacity: 0;
+    filter: brightness(0.5);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+  }
 }
 
 .hero-overlay {
@@ -206,7 +219,8 @@ h3 {
   font-size: 0.8rem;
 }
 .category-section {
-  padding: 40px 5%; /* Adds space on top/bottom and aligns with Hero */
+  padding: 20px 0%;
+  overflow: hidden; /* Adds space on top/bottom and aligns with Hero */
 }
 
 .category-section h3 {
@@ -215,4 +229,42 @@ h3 {
   color: white;
   border-left: 4px solid #e50914; /* Optional: adds a nice red stripe to headers */
   padding-left: 15px;
+}
+/* 1. The Container: Hide for Firefox and IE/Edge */
+.movie-grid {
+  display: flex !important;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 2rem;
+  padding: 10px 4% 20px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  /* Standard way to hide scrollbars in Firefox */
+  scrollbar-width: none;
+  /* Standard way to hide scrollbars in IE/Old Edge */
+  -ms-overflow-style: none;
+}
+
+/* 2. Hide for Chrome, Safari, and New Edge (Webkit) */
+.movie-grid::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* 3. Ensure no child track/thumb styles are overriding the 'none' */
+.movie-grid::-webkit-scrollbar-track,
+.movie-grid::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+/* Ensure MovieCard doesn't shrink */
+.movie-grid > * {
+  flex: 0 0 auto; /* Crucial: prevents cards from squishing to fit the screen */
+  scroll-snap-align: start;
+  width: 180px;
 }

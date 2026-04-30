@@ -10,6 +10,7 @@ const Home = () => {
   const [kids, setKids] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const loadAllContent = async () => {
@@ -34,8 +35,19 @@ const Home = () => {
     };
     loadAllContent();
   }, []);
+  useEffect(() => {
+    if (trending.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === trending.length - 1 ? 0 : prevIndex + 1,
+      );
+    }, 5000);
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [trending]);
 
   if (loading) return <div className="loading">Loading...</div>;
+
+  const currentMovie = trending[currentIndex];
 
   // Use the first movie for the Hero section
   return (
@@ -43,13 +55,18 @@ const Home = () => {
       <header className="hero">
         <div className="hero-overlay"></div>
         {/* Use posterImgUrl from your DB transformation! */}
-        <img src={trending[0]?.posterImgUrl} alt="Hero" className="hero-img" />
+        <img
+          key={currentMovie?._id}
+          src={currentMovie?.posterImgUrl}
+          alt="Hero"
+          className="hero-img fade-in"
+        />
 
         <div className="hero-content">
           <span className="badge">Featured Review</span>
-          <h2 className="hero-title">{trending[0]?.title}</h2>
+          <h2 className="hero-title">{currentMovie?.title}</h2>
 
-          <p className="hero-description">{trending[0]?.description}</p>
+          <p className="hero-description">{currentMovie?.description}</p>
         </div>
       </header>
 

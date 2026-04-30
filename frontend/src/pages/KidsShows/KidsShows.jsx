@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MovieCard from "../../components/MovieCard/MovieCard";
 import { fetchMoviesByCategory } from "../../services/api";
-
+import "./KidsShows.css";
 function KidsShows() {
   const [kidsShows, setKidsShow] = useState([]);
   const [loading, setLoading] = useState(true);
