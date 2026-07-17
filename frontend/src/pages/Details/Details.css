@@ -65,3 +65,139 @@
   display: flex;
   justify-content: space-between;
 }
+.reviews-section {
+  margin-top: 60px;
+  width: 100%;
+}
+
+.reviews-section h2 {
+  margin-bottom: 25px;
+  color: #fff;
+}
+
+.review-form {
+  background: #1b1b1b;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.review-form h3 {
+  color: white;
+}
+
+.review-input,
+.rating-select,
+.review-textarea {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #262626;
+  color: white;
+  font-size: 15px;
+}
+
+.review-input:focus,
+.rating-select:focus,
+.review-textarea:focus {
+  outline: none;
+  border-color: #e50914;
+}
+
+.review-textarea {
+  resize: vertical;
+}
+
+.submit-review {
+  width: fit-content;
+  background: #e50914;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-review:hover {
+  background: #c40812;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-card {
+  background: #1d1d1d;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #2b2b2b;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-header h4 {
+  color: white;
+  margin: 0;
+}
+
+.review-header span {
+  color: gold;
+  font-size: 18px;
+}
+
+.review-date {
+  color: #999;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.review-card p {
+  color: #ddd;
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .details-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .main-info,
+  .right-details {
+    width: 100%;
+  }
+
+  .main-info img {
+    width: 250px;
+    margin: auto;
+    display: block;
+  }
+
+  .reviews-section {
+    width: 100%;
+  }
+}
+.details-page {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.details-container {
+  display: flex;
+  gap: 30px;
+}
+
+.reviews-section {
+  margin-top: 60px;
+}
