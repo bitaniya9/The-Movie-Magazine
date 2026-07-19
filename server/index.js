@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const connectDB = require("../server/src/config/db");
+const connectDB = require("./src/config/db");
 const UserRoutes = require("./src/routes/User.routes");
 const MovieRoutes = require("./src/routes/movieRoutes");
 const ReviewRoutes = require("./src/routes/review.routes");
@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/api", UserRoutes);
 app.use("/api", MovieRoutes);
 app.use("/api", ReviewRoutes);
+
 connectDB();
 
 // // Run immediately at startup
@@ -27,6 +28,14 @@ syncAllMovies();
 //   await syncAllMovies();
 // });
 // console.log(API_KEY);
+if (process.env.NODE_ENV !== "production") {
+  syncAllMovies();
+}
+
+// Start server only when running locally
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+}
 app.get("/", (req, res) => {
   res.json({
     message: "Movie Review API is running",
@@ -35,3 +44,4 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port: ${process.env.PORT}`);
 });
+module.exports = app;
