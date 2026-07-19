@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL:
-    "https://movie-review-server-git-main-bitaniya9s-projects.vercel.app/api/v1", // Note the v1 to match your router!
+  baseURL: "http://localhost:3000/api/v1", // Note the v1 to match your router!
 });
 
 export const fetchMoviesByCategory = async (category) => {
