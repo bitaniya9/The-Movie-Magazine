@@ -4,7 +4,8 @@ const ReviewServices = require("../services/review.services");
 class ReviewControllers {
   async postReview(request, response) {
     try {
-      const newReview = await ReviewServices.postReview(request.body);
+      const reviewData = { ...request.body, userId: request.user.id };
+      const newReview = await ReviewServices.postReview(reviewData);
       response.status(201).json({ success: true, data: newReview });
     } catch (error) {
       response.status(400).json({ message: error.message });

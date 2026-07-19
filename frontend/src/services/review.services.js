@@ -5,23 +5,23 @@ class ReviewService {
     return await Review.create(reviewData);
   }
   async getReviews(page = 1, limit = 7, movieId, userId) {
-    const skip = (page - 1) * limit;
+    console.log("movieId:", movieId);
+    console.log("userId:", userId);
+
     const filter = {};
+
     if (movieId) {
       filter.movieId = movieId;
     }
-    if (userId) {
-      filter.userId = userId;
-    }
+
+    console.log("filter:", filter);
+
     const reviews = await Review.find(filter)
-      .skip(skip)
+      .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
-    const total = await Review.countDocuments(filter);
+
     return {
-      total,
-      page,
-      pages: Math.ceil(total / limit),
       data: reviews,
     };
   }

@@ -56,5 +56,37 @@ export const fetchMovieById = async (id) => {
     console.log("Error getting movie details", error.message);
   }
 };
+
+export const getReviews = async (movieId) => {
+  const response = await API.get("/reviews", { params: { movieId } });
+  return response.data.data;
+};
+export const postReview = async (review) => {
+  const token = localStorage.getItem("token");
+  const response = await API.post("/reviews", review, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const deleteReview = async (id) => {
+  const token = localStorage.getItem("token");
+  return API.delete(`/reviews/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateReview = async (id, review) => {
+  const token = localStorage.getItem("token");
+  return API.patch("", review, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 // You can add more later:
 // export const fetchPopular = () => API.get("/movies?category=Popular");

@@ -2,21 +2,44 @@ import { useEffect, useState } from "react";
 import { fetchMovieById } from "../../services/api";
 import { useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
+import { getReviews, postReview } from "../../services/api";
 import "./Details.css";
 
 const Details = () => {
   const [movie, setMovies] = useState(null);
-  // const [related,setRelated]=useState([])
-  //   const [loading, setLoading] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState("");
+
   const { id } = useParams(); //it will grab the movie id from the url
+  console.log("Route id:", id);
+
+  const loadReviews = async () => {
+    const data = await getReviews(id);
+    setReviews(data.data);
+  };
+
+  const loadMovieDetail = async () => {
+    const data = await fetchMovieById(id);
+    setMovies(data.movie || data);
+  };
 
   useEffect(() => {
-    const loadMovieDetail = async () => {
-      const data = await fetchMovieById(id);
-      setMovies(data.movie || data);
-    };
     loadMovieDetail();
+    loadReviews();
   }, [id]);
+
+  const handleSubmit = async () => {
+    await postReview({
+      movieId: id,
+      comment: reviewText,
+      rating,
+    });
+    setReviewText("");
+    setRating("");
+
+    loadReviews();
+  };
   if (!movie) return <div className="loading">Loading movie details...</div>;
 
   return (
@@ -62,7 +85,11 @@ const Details = () => {
 
           <input type="text" placeholder="Your Name" className="review-input" />
 
-          <select className="rating-select">
+          <select
+            className="rating-select"
+            value={rating}
+            onChange={(e) => setRating(Number(e.target.value))}
+          >
             <option value="">Select Rating</option>
             <option value="5">⭐⭐⭐⭐⭐ (5)</option>
             <option value="4">⭐⭐⭐⭐ (4)</option>
@@ -75,9 +102,13 @@ const Details = () => {
             placeholder="Share your thoughts..."
             rows="5"
             className="review-textarea"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
           ></textarea>
 
-          <button className="submit-review">Submit Review</button>
+          <button className="submit-review" onClick={handleSubmit}>
+            Submit Review
+          </button>
         </div>
 
         {/* Existing Reviews */}
