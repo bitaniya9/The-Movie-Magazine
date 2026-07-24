@@ -4,6 +4,11 @@ const API = axios.create({
   baseURL: "http://localhost:3000/api/v1", // Note the v1 to match your router!
 });
 
+const authHeader = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const fetchMoviesByCategory = async (category) => {
   try {
     const response = await API.get(`/movies?category=${category}`);
@@ -38,9 +43,7 @@ export const fetchUserInfo = async () => {
       throw new Error("No token identified");
     }
     const response = await API.get("/users/profile", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: authHeader(),
     });
     return response.data;
   } catch (error) {
@@ -57,36 +60,37 @@ export const fetchMovieById = async (id) => {
   }
 };
 
-export const getReviews = async (movieId) => {
-  const response = await API.get("/reviews", { params: { movieId } });
+// Reviews ------------------------------------------------------------
+// params can include { page, limit, userId }
+export const getReviews = async (movieId, params = {}) => {
+  const response = await API.get("/reviews", {
+    params: { movieId, ...params },
+  });
+  // response.data is { success, data: { data: [...reviews], total, page, totalPages } }
   return response.data.data;
 };
+
 export const postReview = async (review) => {
-  const token = localStorage.getItem("token");
   const response = await API.post("/reviews", review, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: authHeader(),
+  });
+  return response.data;
+};
+
+export const updateReview = async (id, review) => {
+  // previously hit API.patch("", ...) which dropped the id entirely
+  const response = await API.patch(`/reviews/${id}`, review, {
+    headers: authHeader(),
   });
   return response.data;
 };
 
 export const deleteReview = async (id) => {
-  const token = localStorage.getItem("token");
-  return API.delete(`/reviews/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const response = await API.delete(`/reviews/${id}`, {
+    headers: authHeader(),
   });
+  return response.data;
 };
 
-export const updateReview = async (id, review) => {
-  const token = localStorage.getItem("token");
-  return API.patch("", review, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
 // You can add more later:
 // export const fetchPopular = () => API.get("/movies?category=Popular");

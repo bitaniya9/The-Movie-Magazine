@@ -1,12 +1,48 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faUserCircle } from "@fortawesome/free-solid-svg-icons"; // Added faUserCircle
-import { Link } from "react-router-dom";
+import { faSearch, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchUserInfo } from "../../services/api";
 
-const Navbar = ({ setShowLogin, token }) => {
-  // Assume 'token' is passed to check if logged in
+const Navbar = ({ setShowLogin, token, onLogout }) => {
   const [page, setPage] = useState("Home");
+  const [profile, setProfile] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token) {
+      setProfile(null);
+      return;
+    }
+    fetchUserInfo()
+      .then((payload) => setProfile(payload?.data || payload))
+      .catch(() => setProfile(null));
+  }, [token]);
+
+  // close the profile dropdown on an outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    setShowProfileMenu(false);
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem("token");
+      navigate("/");
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="navbar">
@@ -54,18 +90,40 @@ const Navbar = ({ setShowLogin, token }) => {
       </ul>
 
       <div className="navbar-right">
-        <FontAwesomeIcon icon={faSearch} className="icons" />
+        <Link
+          to="/search"
+          className="icons"
+          onClick={() => setPage("Search")}
+          aria-label="Search"
+        >
+          <FontAwesomeIcon icon={faSearch} />
+        </Link>
 
         {!token ? (
           /* Show Login button if NOT logged in */
           <button onClick={() => setShowLogin(true)}>Login</button>
         ) : (
           /* Show Profile Icon if logged in */
-          <div className="navbar-profile">
-            <Link to="/profile">
+          <div className="navbar-profile" ref={menuRef}>
+            <button
+              className="profile-trigger"
+              onClick={() => setShowProfileMenu((prev) => !prev)}
+              aria-label="Account menu"
+            >
               <FontAwesomeIcon icon={faUserCircle} className="profile-icon" />
-            </Link>
-            {/* You can add a logout dropdown here later */}
+            </button>
+
+            {showProfileMenu && (
+              <div className="profile-dropdown">
+                {profile?.name && (
+                  <p className="profile-name">{profile.name}</p>
+                )}
+                <Link to="/profile" onClick={() => setShowProfileMenu(false)}>
+                  My Profile
+                </Link>
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
           </div>
         )}
       </div>

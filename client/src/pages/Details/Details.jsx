@@ -1,45 +1,156 @@
-import { useEffect, useState } from "react";
-import { fetchMovieById } from "../../services/api";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
-import { getReviews, postReview } from "../../services/api";
+import {
+  fetchMovieById,
+  getReviews,
+  postReview,
+  updateReview,
+  deleteReview,
+  fetchUserInfo,
+} from "../../services/api";
 import "./Details.css";
 
+const STAR_VALUES = [5, 4, 3, 2, 1];
+
+const formatDate = (dateString) =>
+  new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const starsFor = (rating) => "⭐".repeat(rating) + "☆".repeat(5 - rating);
+
 const Details = () => {
-  const [movie, setMovies] = useState(null);
+  const { id } = useParams(); // it will grab the movie id from the url
+  const formRef = useRef(null);
+
+  const [movie, setMovie] = useState(null);
+
   const [reviews, setReviews] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [myReview, setMyReview] = useState(null);
+
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState("");
-
-  const { id } = useParams(); //it will grab the movie id from the url
-  console.log("Route id:", id);
-
-  const loadReviews = async () => {
-    const data = await getReviews(id);
-    setReviews(data.data);
-  };
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const loadMovieDetail = async () => {
     const data = await fetchMovieById(id);
-    setMovies(data.movie || data);
+    setMovie(data.movie || data);
+  };
+
+  const loadReviews = async (targetPage = 1, append = false) => {
+    setReviewsLoading(true);
+    try {
+      const result = await getReviews(id, { page: targetPage });
+      setReviews((prev) => (append ? [...prev, ...result.data] : result.data));
+      setPage(result.page);
+      setTotalPages(result.totalPages);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  // Checks if the logged-in user already has a review on this movie,
+  // regardless of which page of the list it'd fall on.
+  const checkMyReview = async (user) => {
+    if (!user) {
+      setMyReview(null);
+      return;
+    }
+    const result = await getReviews(id, { userId: user._id });
+    const existing = result.data[0] || null;
+    setMyReview(existing);
+    if (existing) {
+      setRating(existing.rating);
+      setReviewText(existing.comment || "");
+    }
+  };
+
+  const loadCurrentUser = async () => {
+    try {
+      const payload = await fetchUserInfo();
+      // adjust this line if your /users/profile response isn't wrapped in { data }
+      const user = payload?.data || payload;
+      setCurrentUser(user || null);
+      return user || null;
+    } catch {
+      setCurrentUser(null);
+      return null;
+    }
   };
 
   useEffect(() => {
     loadMovieDetail();
-    loadReviews();
+    loadReviews(1, false);
+    loadCurrentUser().then(checkMyReview);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleSubmit = async () => {
-    await postReview({
-      movieId: id,
-      comment: reviewText,
-      rating,
-    });
+  const resetForm = () => {
     setReviewText("");
     setRating("");
-
-    loadReviews();
+    setFormError("");
   };
+
+  const handleSubmit = async () => {
+    if (!currentUser) {
+      setFormError("Log in to write a review.");
+      return;
+    }
+    if (!rating) {
+      setFormError("Please select a rating.");
+      return;
+    }
+    setSubmitting(true);
+    setFormError("");
+    try {
+      if (myReview) {
+        const updated = await updateReview(myReview._id, {
+          comment: reviewText,
+          rating,
+        });
+        setMyReview(updated.data || updated);
+      } else {
+        await postReview({ movieId: id, comment: reviewText, rating });
+        console.log(id);
+        await checkMyReview(currentUser);
+      }
+      await loadReviews(1, false);
+    } catch (error) {
+      setFormError(
+        error.response?.data?.message || "Something went wrong. Try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (reviewId) => {
+    if (!window.confirm("Delete this review?")) return;
+    try {
+      await deleteReview(reviewId);
+      if (myReview?._id === reviewId) {
+        setMyReview(null);
+        resetForm();
+      }
+      await loadReviews(1, false);
+    } catch (error) {
+      alert(error.response?.data?.message || "Couldn't delete review.");
+    }
+  };
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   if (!movie) return <div className="loading">Loading movie details...</div>;
 
   return (
@@ -53,16 +164,16 @@ const Details = () => {
           <div className="meta-row">
             <span>Release Year: {movie.releaseYear}</span>
             <span className="dot">.</span>
-            <span>{movie.genre?.join(", ")}</span>
+            <span>{movie.category?.join(", ")}</span>
           </div>
           <p className="description">{movie.description}</p>
           <p className="review-count"> Review Count: {movie.reviewCount}</p>
           <div className="credits">
             <p>
-              <strong>Director:</strong> {movie.director || "N/A"}
-            </p>
-            <p>
-              <strong>Cast:</strong> {movie.cast?.join(", ") || "N/A"}
+              <strong>Average Rating:</strong>{" "}
+              {movie.averageRating
+                ? `${movie.averageRating.toFixed(1)} / 10`
+                : "No ratings yet"}
             </p>
           </div>
           <div className="buttons">
@@ -80,66 +191,104 @@ const Details = () => {
         <h2>Reviews</h2>
 
         {/* Review Form */}
-        <div className="review-form">
-          <h3>Write a Review</h3>
+        <div className="review-form" ref={formRef}>
+          <h3>{myReview ? "Edit Your Review" : "Write a Review"}</h3>
 
-          <input type="text" placeholder="Your Name" className="review-input" />
+          {!currentUser ? (
+            <p className="login-prompt">Log in to write a review.</p>
+          ) : (
+            <>
+              <select
+                className="rating-select"
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+              >
+                <option value="">Select Rating</option>
+                {STAR_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {"⭐".repeat(value)} ({value})
+                  </option>
+                ))}
+              </select>
 
-          <select
-            className="rating-select"
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-          >
-            <option value="">Select Rating</option>
-            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-            <option value="4">⭐⭐⭐⭐ (4)</option>
-            <option value="3">⭐⭐⭐ (3)</option>
-            <option value="2">⭐⭐ (2)</option>
-            <option value="1">⭐ (1)</option>
-          </select>
+              <textarea
+                placeholder="Share your thoughts..."
+                rows="5"
+                className="review-textarea"
+                maxLength={700}
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+              ></textarea>
+              <p className="char-count">{reviewText.length}/700</p>
 
-          <textarea
-            placeholder="Share your thoughts..."
-            rows="5"
-            className="review-textarea"
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-          ></textarea>
+              {formError && <p className="form-error">{formError}</p>}
 
-          <button className="submit-review" onClick={handleSubmit}>
-            Submit Review
-          </button>
+              <button
+                className="submit-review"
+                onClick={handleSubmit}
+                disabled={submitting}
+              >
+                {submitting
+                  ? "Saving..."
+                  : myReview
+                    ? "Update Review"
+                    : "Submit Review"}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Existing Reviews */}
         <div className="reviews-list">
-          <div className="review-card">
-            <div className="review-header">
-              <h4>John Doe</h4>
-              <span>⭐⭐⭐⭐⭐</span>
-            </div>
+          {reviewsLoading && reviews.length === 0 && <p>Loading reviews...</p>}
 
-            <p className="review-date">July 17, 2026</p>
+          {!reviewsLoading && reviews.length === 0 && (
+            <p>No reviews yet — be the first!</p>
+          )}
 
-            <p>
-              Amazing movie! The visuals were stunning and the acting was
-              incredible. Definitely one of my favorites.
-            </p>
-          </div>
+          {reviews.map((review) => {
+            const isOwner =
+              currentUser &&
+              (review.userId?._id || review.userId) === currentUser._id;
+            return (
+              <div className="review-card" key={review._id}>
+                <div className="review-header">
+                  <h4>
+                    {isOwner ? "You" : review.userId?.name || "Anonymous"}
+                  </h4>
+                  <span>{starsFor(review.rating)}</span>
+                </div>
 
-          <div className="review-card">
-            <div className="review-header">
-              <h4>Sarah</h4>
-              <span>⭐⭐⭐⭐</span>
-            </div>
+                <p className="review-date">{formatDate(review.createdAt)}</p>
 
-            <p className="review-date">July 10, 2026</p>
+                <p>{review.comment}</p>
 
-            <p>
-              Really enjoyable. The pacing was a little slow in the middle, but
-              the ending made up for it.
-            </p>
-          </div>
+                {isOwner && (
+                  <div className="review-owner-actions">
+                    <button className="edit-btn" onClick={scrollToForm}>
+                      Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(review._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {page < totalPages && (
+            <button
+              className="load-more-btn"
+              onClick={() => loadReviews(page + 1, true)}
+              disabled={reviewsLoading}
+            >
+              {reviewsLoading ? "Loading..." : "Load More Reviews"}
+            </button>
+          )}
         </div>
       </div>
     </div>

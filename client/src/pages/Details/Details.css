@@ -48,18 +48,6 @@
   color: white;
 }
 
-/* .watchlist-btn .favorite-btn {
-  
-} */
-
-/* .favorite-btn {
-  background-color: transparent;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  color: white;
-  gap: 8px;
-} */
 .buttons {
   margin: 2rem;
   display: flex;
@@ -125,6 +113,11 @@
 
 .submit-review:hover {
   background: #c40812;
+}
+
+.submit-review:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .reviews-list {
@@ -200,4 +193,73 @@
 
 .reviews-section {
   margin-top: 60px;
+}
+
+/* --- Added for functional review form/actions --- */
+
+.login-prompt {
+  color: #999;
+}
+
+.form-error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.char-count {
+  color: #777;
+  font-size: 0.8rem;
+  text-align: right;
+  margin: -8px 0 0;
+}
+
+.review-owner-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ddd;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.edit-btn:hover {
+  border-color: #e50914;
+  color: #e50914;
+}
+
+.delete-btn:hover {
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+.load-more-btn {
+  align-self: center;
+  background: transparent;
+  border: 1px solid #333;
+  color: #ddd;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.load-more-btn:hover {
+  border-color: #e50914;
+  color: #e50914;
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

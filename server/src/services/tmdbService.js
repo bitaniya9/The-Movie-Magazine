@@ -31,10 +31,43 @@ const fetchKidsMovies = async () => {
 
   return await fetchFromTMDB("/discover/movie", params);
 };
+
+// --- Search & genre browsing ---
+
+const searchMovies = (query) =>
+  fetchFromTMDB("/search/movie", { query, include_adult: false });
+
+const discoverMoviesByGenre = (genreId) =>
+  fetchFromTMDB("/discover/movie", {
+    with_genres: genreId,
+    sort_by: "popularity.desc",
+  });
+
+// TMDB's genre list endpoint returns { genres: [...] }, not { results: [...] },
+// so it can't reuse fetchFromTMDB.
+const fetchGenreList = async () => {
+  const response = await axios.get(`${BASE_URL}/genre/movie/list`, {
+    params: { api_key: API_KEY },
+  });
+  return response.data.genres; // [{ id, name }, ...]
+};
+
+// Also not a { results: [...] } shape - returns the full movie object directly.
+const fetchMovieDetails = async (tmdbId) => {
+  const response = await axios.get(`${BASE_URL}/movie/${tmdbId}`, {
+    params: { api_key: API_KEY },
+  });
+  return response.data;
+};
+
 module.exports = {
   fetchTrendingMovies,
   fetchPopularMovies,
   fetchTopRatedMovies,
   fetchSeries,
   fetchKidsMovies,
+  searchMovies,
+  discoverMoviesByGenre,
+  fetchGenreList,
+  fetchMovieDetails,
 };
