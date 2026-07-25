@@ -46,10 +46,10 @@ const Details = () => {
     setMovie(data.movie || data);
   };
 
-  const loadReviews = async (targetPage = 1, append = false) => {
+  const loadReviews = async (movieObjId, targetPage = 1, append = false) => {
     setReviewsLoading(true);
     try {
-      const result = await getReviews(id, { page: targetPage });
+      const result = await getReviews(movieObjId, { page: targetPage });
       setReviews((prev) => (append ? [...prev, ...result.data] : result.data));
       setPage(result.page);
       setTotalPages(result.totalPages);
@@ -60,12 +60,12 @@ const Details = () => {
 
   // Checks if the logged-in user already has a review on this movie,
   // regardless of which page of the list it'd fall on.
-  const checkMyReview = async (user) => {
+  const checkMyReview = async (movieObjId, user) => {
     if (!user) {
       setMyReview(null);
       return;
     }
-    const result = await getReviews(id, { userId: user._id });
+    const result = await getReviews(movieObjId, { userId: user._id });
     const existing = result.data[0] || null;
     setMyReview(existing);
     if (existing) {
@@ -89,10 +89,17 @@ const Details = () => {
 
   useEffect(() => {
     loadMovieDetail();
-    loadReviews(1, false);
-    loadCurrentUser().then(checkMyReview);
+    loadCurrentUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Reviews reference the movie's Mongo _id, not the tmdbId in the URL,
+  // so wait until the movie itself has loaded before fetching reviews.
+  useEffect(() => {
+    if (!movie?._id) return;
+    loadReviews(movie._id, 1, false);
+    checkMyReview(movie._id, currentUser);
+  }, [movie?._id, currentUser]);
 
   const resetForm = () => {
     setReviewText("");
@@ -119,11 +126,10 @@ const Details = () => {
         });
         setMyReview(updated.data || updated);
       } else {
-        await postReview({ movieId: id, comment: reviewText, rating });
-        console.log(id);
-        await checkMyReview(currentUser);
+        await postReview({ movieId: movie._id, comment: reviewText, rating });
+        await checkMyReview(movie._id, currentUser);
       }
-      await loadReviews(1, false);
+      await loadReviews(movie._id, 1, false);
     } catch (error) {
       setFormError(
         error.response?.data?.message || "Something went wrong. Try again.",
@@ -141,7 +147,7 @@ const Details = () => {
         setMyReview(null);
         resetForm();
       }
-      await loadReviews(1, false);
+      await loadReviews(movie._id, 1, false);
     } catch (error) {
       alert(error.response?.data?.message || "Couldn't delete review.");
     }
@@ -172,7 +178,7 @@ const Details = () => {
             <p>
               <strong>Average Rating:</strong>{" "}
               {movie.averageRating
-                ? `${movie.averageRating.toFixed(1)} / 10`
+                ? `${movie.averageRating.toFixed(1)} / 5`
                 : "No ratings yet"}
             </p>
           </div>
@@ -283,7 +289,7 @@ const Details = () => {
           {page < totalPages && (
             <button
               className="load-more-btn"
-              onClick={() => loadReviews(page + 1, true)}
+              onClick={() => loadReviews(movie._id, page + 1, true)}
               disabled={reviewsLoading}
             >
               {reviewsLoading ? "Loading..." : "Load More Reviews"}
