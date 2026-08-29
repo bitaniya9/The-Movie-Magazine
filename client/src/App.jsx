@@ -11,7 +11,7 @@ import Details from "./pages/Details/Details";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   return (
     <>
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}

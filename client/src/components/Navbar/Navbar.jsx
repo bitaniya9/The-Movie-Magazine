@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { fetchUserInfo } from "../../services/api";
 
 const Navbar = ({ setShowLogin, token, onLogout }) => {
+  const [showSearch, setShowSearch] = useState(false);
   const [page, setPage] = useState("Home");
   const [profile, setProfile] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -46,10 +47,12 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
 
   return (
     <div className="navbar">
+      {/* Logo */}
       <Link to="/" onClick={() => setPage("Home")}>
         <h1 className="title">Movie Review</h1>
       </Link>
 
+      {/* Categories */}
       <ul className="navbar-menu">
         <li>
           <Link
@@ -60,6 +63,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
             Home
           </Link>
         </li>
+
         <li>
           <Link
             to="/movies"
@@ -69,6 +73,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
             Movies
           </Link>
         </li>
+
         <li>
           <Link
             to="/series"
@@ -78,6 +83,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
             TV Shows
           </Link>
         </li>
+
         <li>
           <Link
             to="/kidsShows"
@@ -89,21 +95,32 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
         </li>
       </ul>
 
+      {/* Search + Profile */}
       <div className="navbar-right">
-        <Link
-          to="/search"
-          className="icons"
-          onClick={() => setPage("Search")}
-          aria-label="Search"
-        >
-          <FontAwesomeIcon icon={faSearch} />
-        </Link>
+        <div className="search-container">
+          {showSearch && (
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search movies..."
+              autoFocus
+            />
+          )}
+
+          <button
+            className="search-btn"
+            onClick={() => setShowSearch((prev) => !prev)}
+            aria-label="Search"
+          >
+            <FontAwesomeIcon icon={faSearch} />
+          </button>
+        </div>
 
         {!token ? (
-          /* Show Login button if NOT logged in */
-          <button onClick={() => setShowLogin(true)}>Login</button>
+          <button className="login-btn" onClick={() => setShowLogin(true)}>
+            Login
+          </button>
         ) : (
-          /* Show Profile Icon if logged in */
           <div className="navbar-profile" ref={menuRef}>
             <button
               className="profile-trigger"
@@ -115,12 +132,25 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
 
             {showProfileMenu && (
               <div className="profile-dropdown">
-                {profile?.name && (
-                  <p className="profile-name">{profile.name}</p>
-                )}
+                <div className="profile-info">
+                  <FontAwesomeIcon
+                    icon={faUserCircle}
+                    className="dropdown-profile-icon"
+                  />
+
+                  <div>
+                    <p className="profile-name">{profile?.name || "User"}</p>
+
+                    <p className="profile-email">{profile?.email || ""}</p>
+                  </div>
+                </div>
+
+                <div className="dropdown-divider" />
+
                 <Link to="/profile" onClick={() => setShowProfileMenu(false)}>
                   My Profile
                 </Link>
+
                 <button onClick={handleLogout}>Logout</button>
               </div>
             )}
