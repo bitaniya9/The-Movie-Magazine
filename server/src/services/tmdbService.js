@@ -7,14 +7,17 @@ const fetchFromTMDB = async (endpoint, extraParams = {}) => {
   const response = await axios.get(`${BASE_URL}${endpoint}`, {
     params: { api_key: API_KEY, ...extraParams },
   });
-  return response.data.results;
+  return response.data;
 };
 
-const fetchTrendingMovies = () => fetchFromTMDB("/trending/movie/week");
-const fetchPopularMovies = () => fetchFromTMDB("/movie/popular");
-const fetchTopRatedMovies = () => fetchFromTMDB("/movie/top_rated");
-const fetchSeries = () => fetchFromTMDB("/tv/popular");
-const fetchKidsMovies = async () => {
+const fetchTrendingMovies = (page = 1) =>
+  fetchFromTMDB("/trending/movie/week", { page });
+const fetchPopularMovies = (page = 1) =>
+  fetchFromTMDB("/movie/popular", { page });
+const fetchTopRatedMovies = (page = 1) =>
+  fetchFromTMDB("/movie/top_rated", { page });
+const fetchSeries = (page = 1) => fetchFromTMDB("/tv/popular", { page });
+const fetchKidsMovies = (page = 1) => {
   const params = {
     // Using a comma here means: Animation AND Family
     with_genres: "16,10751",
@@ -29,18 +32,26 @@ const fetchKidsMovies = async () => {
   // DEBUG: Check your terminal to see if these params are actually being used!
   console.log("Requesting Kids Movies with params:", params);
 
-  return await fetchFromTMDB("/discover/movie", params);
+  return fetchFromTMDB("/discover/movie", params);
 };
+const discoverMovies = (page = 1) =>
+  fetchFromTMDB("/discover/movie", {
+    page,
+    include_adult: false,
+    sort_by: "popularity.desc",
+  });
 
 // --- Search & genre browsing ---
 
-const searchMovies = (query) =>
-  fetchFromTMDB("/search/movie", { query, include_adult: false });
+const searchMovies = (query, page = 1) =>
+  fetchFromTMDB("/search/movie", { query, page, include_adult: false });
 
-const discoverMoviesByGenre = (genreId) =>
+const discoverMoviesByGenre = (genreId, page = 1) =>
   fetchFromTMDB("/discover/movie", {
     with_genres: genreId,
     sort_by: "popularity.desc",
+    page,
+    include_adult: false,
   });
 
 // TMDB's genre list endpoint returns { genres: [...] }, not { results: [...] },
@@ -64,6 +75,7 @@ module.exports = {
   fetchTrendingMovies,
   fetchPopularMovies,
   fetchTopRatedMovies,
+  discoverMovies,
   fetchSeries,
   fetchKidsMovies,
   searchMovies,

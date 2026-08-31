@@ -178,7 +178,7 @@ const Details = () => {
             <p>
               <strong>Average Rating:</strong>{" "}
               {movie.averageRating
-                ? `${movie.averageRating.toFixed(1)} / 5`
+                ? `${movie.averageRating.toFixed(1)} / 10`
                 : "No ratings yet"}
             </p>
           </div>

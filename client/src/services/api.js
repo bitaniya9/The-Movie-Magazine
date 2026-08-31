@@ -9,15 +9,36 @@ const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const fetchMoviesByCategory = async (category) => {
+export const fetchMoviesByCategory = async (category, page = 1) => {
   try {
-    const response = await API.get(`/movies?category=${category}`);
+    const response = await API.get("/movies", { params: { category, page } });
     return response.data;
   } catch (error) {
     console.error(`Error fetching ${category} movies: `, error.message);
-    return [];
+    return { page: 1, total_pages: 0, total_results: 0, results: [] };
   }
 };
+
+export const searchMovies = async (query, page = 1) => {
+  try {
+    const response = await API.get("/movies/search", {
+      params: {
+        query,
+        page,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error searching movies:", error.message);
+    return {
+      page: 1,
+      total_pages: 0,
+      total_results: 0,
+      results: [],
+    };
+  }
+};
+
 export const loginUser = async (credentials) => {
   try {
     const response = await API.post("/users/login", credentials);

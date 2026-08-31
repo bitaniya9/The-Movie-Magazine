@@ -1,41 +1,88 @@
 import { useEffect, useRef, useState } from "react";
 import "./Navbar.css";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+
 import { Link, useNavigate } from "react-router-dom";
 import { fetchUserInfo } from "../../services/api";
 
 const Navbar = ({ setShowLogin, token, onLogout }) => {
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [page, setPage] = useState("Home");
   const [profile, setProfile] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
   const menuRef = useRef(null);
+  const searchInputRef = useRef(null);
+
   const navigate = useNavigate();
+
+  // ==========================================
+  // GET USER PROFILE
+  // ==========================================
 
   useEffect(() => {
     if (!token) {
       setProfile(null);
       return;
     }
+
     fetchUserInfo()
       .then((payload) => setProfile(payload?.data || payload))
       .catch(() => setProfile(null));
   }, [token]);
 
-  // close the profile dropdown on an outside click
+  // ==========================================
+  // CLOSE PROFILE DROPDOWN
+  // ==========================================
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowProfileMenu(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
+
+  // ==========================================
+  // SEARCH
+  // ==========================================
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const query = searchQuery.trim();
+
+    if (!query) {
+      return;
+    }
+
+    // Navigate to search results page
+    navigate(`/search?query=${encodeURIComponent(query)}`);
+
+    // Close search box
+    setShowSearch(false);
+
+    // Clear input
+    setSearchQuery("");
+  };
+
+  // ==========================================
+  // LOGOUT
+  // ==========================================
 
   const handleLogout = () => {
     setShowProfileMenu(false);
+
     if (onLogout) {
       onLogout();
     } else {
@@ -45,14 +92,33 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
     }
   };
 
+  // ==========================================
+  // TOGGLE SEARCH
+  // ==========================================
+
+  const handleSearchToggle = () => {
+    setShowSearch((prev) => !prev);
+
+    // Focus input after it appears
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 0);
+  };
+
   return (
     <div className="navbar">
-      {/* Logo */}
+      {/* ==========================================
+          LOGO
+      ========================================== */}
+
       <Link to="/" onClick={() => setPage("Home")}>
         <h1 className="title">Movie Review</h1>
       </Link>
 
-      {/* Categories */}
+      {/* ==========================================
+          CATEGORIES
+      ========================================== */}
+
       <ul className="navbar-menu">
         <li>
           <Link
@@ -95,32 +161,44 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
         </li>
       </ul>
 
-      {/* Search + Profile */}
+      {/* ==========================================
+          SEARCH + PROFILE
+      ========================================== */}
+
       <div className="navbar-right">
-        <div className="search-container">
+        {/* SEARCH */}
+
+        <form className="search-container" onSubmit={handleSearch}>
           {showSearch && (
             <input
+              ref={searchInputRef}
               type="text"
               className="search-input"
               placeholder="Search movies..."
-              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           )}
 
           <button
+            type="button"
             className="search-btn"
-            onClick={() => setShowSearch((prev) => !prev)}
+            onClick={handleSearchToggle}
             aria-label="Search"
           >
             <FontAwesomeIcon icon={faSearch} />
           </button>
-        </div>
+        </form>
+
+        {/* LOGIN */}
 
         {!token ? (
           <button className="login-btn" onClick={() => setShowLogin(true)}>
             Login
           </button>
         ) : (
+          /* PROFILE */
+
           <div className="navbar-profile" ref={menuRef}>
             <button
               className="profile-trigger"

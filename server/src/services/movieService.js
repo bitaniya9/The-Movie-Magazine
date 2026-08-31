@@ -1,9 +1,12 @@
+const { Query } = require("mongoose");
 const Movie = require("../models/Movie");
 const {
   fetchPopularMovies,
   fetchTrendingMovies,
   fetchTopRatedMovies,
   fetchMovieDetails,
+  discoverMovies,
+  searchMovies: searchMoviesFromTMDB,
 } = require("./tmdbService");
 
 const transformMovie = (movie, categoryName) => ({
@@ -22,10 +25,17 @@ const transformMovie = (movie, categoryName) => ({
   tmdbId: movie.id,
 });
 
-const syncCategory = async (fetchFunction, categoryName) => {
-  const rawMovies = await fetchFunction();
+const syncCategory = async (fetchFunction, categoryName, pages = 1) => {
+  const allMovies = [];
 
-  const transformedMovies = rawMovies.map((movie) =>
+  for (let page = 1; page <= pages; page++) {
+    const data = await fetchFunction(page);
+
+    if (data && data.results) {
+      allMovies.push(...data.results);
+    }
+  }
+  const transformedMovies = allMovies.map((movie) =>
     transformMovie(movie, categoryName),
   );
 
@@ -33,7 +43,7 @@ const syncCategory = async (fetchFunction, categoryName) => {
     return await Movie.findOneAndUpdate(
       { tmdbId: movie.tmdbId },
       { $set: movie },
-      { upsert: true, returnDocument: "after" },
+      { upsert: true, returnDocument: true },
     );
   });
   return Promise.all(savePromises);
@@ -41,9 +51,9 @@ const syncCategory = async (fetchFunction, categoryName) => {
 
 const syncAllMovies = async () => {
   try {
-    await syncCategory(fetchPopularMovies, "Popular");
-    await syncCategory(fetchTopRatedMovies, "Top Rated");
-    await syncCategory(fetchTrendingMovies, "Trending");
+    await syncCategory(fetchPopularMovies, "Popular", 5);
+    await syncCategory(fetchTopRatedMovies, "Top Rated", 5);
+    await syncCategory(fetchTrendingMovies, "Trending", 1);
     console.log("All movies synced successfully.");
   } catch (error) {
     console.error("Sync failed:", error);
@@ -54,22 +64,64 @@ const getMovies = async (filter = {}) => {
   return await Movie.find(filter);
 };
 
-// tmdbId arrives as a route param string; Mongoose casts it to Number for the query.
+const getDiscoverMovies = async (page = 1) => {
+  const data = await discoverMovies(page);
+
+  const transformedMovies = data.results.map((movie) =>
+    transformMovie(movie, "Discover"),
+  );
+  return {
+    page: data.page,
+    results: transformedMovies,
+    total_pages: data.total_pages,
+    total_results: data.total_results,
+  };
+};
+const searchMovies = async (Query, page = 1) => {
+  if (!query || !query.trim()) {
+    return {
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    };
+  }
+  const data = await searchMoviesFromTMDB(query.trim(), page);
+
+  const transformedMovies = data.results.map((movie) =>
+    transformMovie(movie, "Search"),
+  );
+
+  return {
+    page: data.page,
+    results: transformedMovies,
+    total_pages: data.total_pages,
+    total_results: data.total_results,
+  };
+};
+
 const getMovieById = async (tmdbId) => {
   let movie = await Movie.findOne({ tmdbId });
-  if (movie) return movie;
 
-  // Not synced yet - happens for anything that only ever came from search,
-  // genre browsing, Kids, or Series, since syncAllMovies only covers
-  // Popular/TopRated/Trending. Fetch it directly from TMDB and persist it
-  // so it gets a real Mongo _id that a review can reference.
+  if (movie) {
+    return movie;
+  }
+
   const raw = await fetchMovieDetails(tmdbId);
-  if (!raw || !raw.id) return null;
+
+  if (!raw || !raw.id) {
+    return null;
+  }
 
   movie = await Movie.findOneAndUpdate(
     { tmdbId: raw.id },
-    { $set: transformMovie(raw, "General") },
-    { upsert: true, new: true },
+    {
+      $set: transformMovie(raw, "General"),
+    },
+    {
+      upsert: true,
+      returnDocument: true,
+    },
   );
   return movie;
 };
@@ -77,5 +129,7 @@ const getMovieById = async (tmdbId) => {
 module.exports = {
   syncAllMovies,
   getMovies,
+  getDiscoverMovies,
+  searchMovies,
   getMovieById,
 };

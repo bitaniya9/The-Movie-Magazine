@@ -4,11 +4,11 @@ const router = express.Router();
 const {
   getAllMovies,
   getMoviesById,
+  searchMovies,
 } = require("../controllers/movieControllers");
 
-// 2. Define the route
-// Line 5: This will now work because getAllMovies is a real function!
 router.get("/v1/movies", getAllMovies);
+router.get("/v1/movies/search", searchMovies);
 router.get("/v1/movie/:id", getMoviesById);
 
 module.exports = router;

@@ -1,24 +1,52 @@
 const mongoose = require("mongoose");
 
 const MovieSchema = new mongoose.Schema({
-  tmdbId: { type: Number, required: true },
+  tmdbId: {
+    type: Number,
+    required: true,
+  },
 
-  title: { type: String, required: true },
+  title: {
+    type: String,
+    required: true,
+  },
 
-  posterImgUrl: { type: String },
+  posterImgUrl: {
+    type: String,
+  },
 
-  description: { type: String },
+  description: {
+    type: String,
+  },
 
   category: {
     type: [String],
-    enum: ["Trending", "Popular", "Kids", "Classics"],
+    enum: [
+      "Trending",
+      "Popular",
+      "Top Rated",
+      "Kids",
+      "Series",
+      "Discover",
+      "Search",
+      "Classics",
+      "General",
+    ],
   },
 
-  releaseYear: Number,
+  releaseYear: {
+    type: String,
+  },
 
-  averageRating: { type: Number, default: 0 },
+  averageRating: {
+    type: Number,
+    default: 0,
+  },
 
-  reviewCount: { type: Number, default: 0 },
+  reviewCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("Movie", MovieSchema);
