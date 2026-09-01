@@ -72,12 +72,17 @@ export const fetchUserInfo = async () => {
     throw error;
   }
 };
-export const fetchMovieById = async (id) => {
+export const fetchMovieById = async (id, mediaType = "movie") => {
   try {
-    const response = await API.get(`/movie/${id}`);
+    const response = await API.get(`/movie/${id}`, {
+      params: {
+        type: mediaType,
+      },
+    });
     return response.data;
   } catch (error) {
     console.log("Error getting movie details", error.message);
+    throw error;
   }
 };
 
@@ -115,3 +120,22 @@ export const deleteReview = async (id) => {
 
 // You can add more later:
 // export const fetchPopular = () => API.get("/movies?category=Popular");
+
+export const fetchMoviesByGenre = async (genreId, page = 1) => {
+  try {
+    const response = await API.get(`/movies/genre/${genreId}`, {
+      params: { page },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching genre movies:", error.message);
+
+    return {
+      page: 1,
+      total_pages: 0,
+      total_results: 0,
+      results: [],
+    };
+  }
+};

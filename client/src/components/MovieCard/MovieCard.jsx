@@ -9,7 +9,10 @@ const MovieCard = ({ movie }) => {
   });
 
   return (
-    <Link to={`/movie/${movie._id}`} className="movie-card-link">
+    <Link
+      to={`/movie/${movie._id}?type=${movie.mediaType || "movie"}`}
+      className="movie-card-link"
+    >
       <div className="movie-card">
         <div className="card-image-wrapper">
           <img src={movie.posterImgUrl} alt={movie.title} />

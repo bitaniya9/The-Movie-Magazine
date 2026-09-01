@@ -44,7 +44,7 @@ const discoverMovies = (page = 1) =>
 // --- Search & genre browsing ---
 
 const searchMovies = (query, page = 1) =>
-  fetchFromTMDB("/search/movie", { query, page, include_adult: false });
+  fetchFromTMDB("/search/multi", { query, page, include_adult: false });
 
 const discoverMoviesByGenre = (genreId, page = 1) =>
   fetchFromTMDB("/discover/movie", {
@@ -70,8 +70,17 @@ const fetchMovieDetails = async (tmdbId) => {
   });
   return response.data;
 };
+const fetchTVDetails = async (tmdbId) => {
+  const response = await axios.get(`${BASE_URL}/tv/${tmdbId}`, {
+    params: {
+      api_key: API_KEY,
+    },
+  });
+  return response.data;
+};
 
 module.exports = {
+  fetchTVDetails,
   fetchTrendingMovies,
   fetchPopularMovies,
   fetchTopRatedMovies,

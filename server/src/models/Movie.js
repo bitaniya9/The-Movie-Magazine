@@ -47,6 +47,11 @@ const MovieSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  mediaType: {
+    type: String,
+    enum: ["movie", "tv"],
+    default: "movie",
+  },
 });
 
 module.exports = mongoose.model("Movie", MovieSchema);

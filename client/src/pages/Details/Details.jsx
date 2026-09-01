@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import {
   fetchMovieById,
@@ -24,6 +24,8 @@ const starsFor = (rating) => "⭐".repeat(rating) + "☆".repeat(5 - rating);
 
 const Details = () => {
   const { id } = useParams(); // it will grab the movie id from the url
+  const [searchParams] = useSearchParams();
+  const mediaType = searchParams.get("type") || "movie";
   const formRef = useRef(null);
 
   const [movie, setMovie] = useState(null);
@@ -41,10 +43,10 @@ const Details = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
-  const loadMovieDetail = async () => {
-    const data = await fetchMovieById(id);
-    setMovie(data.movie || data);
-  };
+  // const loadMovieDetail = async () => {
+  //   const data = await fetchMovieById(id);
+  //   setMovie(data.movie || data);
+  // };
 
   const loadReviews = async (movieObjId, targetPage = 1, append = false) => {
     setReviewsLoading(true);
@@ -88,10 +90,17 @@ const Details = () => {
   };
 
   useEffect(() => {
-    loadMovieDetail();
-    loadCurrentUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    const loadMovie = async () => {
+      try {
+        const data = await fetchMovieById(id, mediaType);
+        setMovie(data.movie);
+      } catch (error) {
+        console.error("Error loading details:", error);
+      }
+    };
+    loadMovie();
+    loadCurrentUser(); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, mediaType]);
 
   // Reviews reference the movie's Mongo _id, not the tmdbId in the URL,
   // so wait until the movie itself has loaded before fetching reviews.

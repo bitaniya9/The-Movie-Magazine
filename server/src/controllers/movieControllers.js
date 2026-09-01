@@ -3,10 +3,48 @@ const {
   fetchTopRatedMovies,
   fetchKidsMovies,
   fetchSeries,
+  fetchTVDetails,
   discoverMovies,
+  discoverMoviesByGenre,
   searchMovies: searchMoviesFromTMDB,
 } = require("../services/tmdbService");
 const { getMovieById } = require("../services/movieService");
+
+const getMoviesByGenre = async (req, res) => {
+  try {
+    const { genreId } = req.params;
+    const page = Number(req.query.page) || 1;
+
+    const data = await discoverMoviesByGenre(genreId, page);
+
+    const transformed = (data.results || []).map((m) => ({
+      _id: m.id,
+      tmdbId: m.id,
+      title: m.title || "Untitled",
+      posterImgUrl: m.poster_path
+        ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+        : undefined,
+      releaseYear: (m.release_date || "").split("-")[0] || "N/A",
+      averageRating: m.vote_average,
+      description: m.overview,
+      category: ["Movies"],
+      mediaType: "movie",
+    }));
+
+    res.json({
+      page: data.page,
+      total_pages: data.total_pages,
+      total_results: data.total_results,
+      results: transformed,
+    });
+  } catch (error) {
+    console.error("Genre Controller Error:", error.message);
+
+    res.status(500).json({
+      error: "Failed to fetch movies by genre",
+    });
+  }
+};
 
 const getAllMovies = async (req, res) => {
   try {
@@ -38,6 +76,7 @@ const getAllMovies = async (req, res) => {
         (m.release_date || m.first_air_date || "").split("-")[0] || "N/A",
       averageRating: m.vote_average,
       category: [category || "Discover"],
+      mediaType: category === "Series" ? "tv" : "movie",
       description: m.overview,
       tmdbId: m.id,
     }));
@@ -67,23 +106,27 @@ const searchMovies = async (req, res) => {
     }
     const data = await searchMoviesFromTMDB(query.trim(), page);
 
-    const transformed = (data.results || []).map((m) => ({
-      _id: m.id,
-      title: m.title || "Untitled",
-      posterImgUrl: m.poster_path
-        ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-        : undefined,
+    const transformed = (data.results || [])
+      .filter((m) => m.media_type == "movie" || m.media_type === "tv")
+      .map((m) => ({
+        _id: m.id,
+        title: m.title || "Untitled",
+        posterImgUrl: m.poster_path
+          ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+          : undefined,
 
-      releaseYear: (m.release_date || "").split("-")[0] || "N/A",
+        releaseYear: (m.release_date || "").split("-")[0] || "N/A",
 
-      averageRating: m.vote_average,
+        averageRating: m.vote_average,
 
-      category: ["Search"],
+        category: [m.media_type === "tv" ? "Series" : "Search"],
 
-      description: m.overview,
+        description: m.overview,
 
-      tmdbId: m.id,
-    }));
+        mediaType: m.media_type,
+        tmdbId: m.id,
+      }));
+
     res.json({
       page: data.page,
       total_pages: data.total_pages,
@@ -102,10 +145,13 @@ const searchMovies = async (req, res) => {
 const getMoviesById = async (request, response) => {
   try {
     const { id } = request.params;
-    const movie = await getMovieById(id);
+    const { type } = request.query;
+
+    const mediaType = type === "tv" ? "tv" : "movie";
+    const movie = await getMovieById(id, mediaType);
     if (!movie) {
-      return response.status(400).json({
-        message: "Movie not found",
+      return response.status(404).json({
+        message: "Movie/TV not found",
       });
     }
     response.status(200).json({ movie });
@@ -116,4 +162,9 @@ const getMoviesById = async (request, response) => {
 };
 
 // 4. Export it so the Router can see it
-module.exports = { getAllMovies, searchMovies, getMoviesById };
+module.exports = {
+  getAllMovies,
+  searchMovies,
+  getMoviesById,
+  getMoviesByGenre,
+};

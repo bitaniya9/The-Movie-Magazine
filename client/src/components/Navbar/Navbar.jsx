@@ -112,7 +112,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
       ========================================== */}
 
       <Link to="/" onClick={() => setPage("Home")}>
-        <h1 className="title">Movie Review</h1>
+        <h1 className="title">Movie Info and Reviews</h1>
       </Link>
 
       {/* ==========================================
