@@ -20,13 +20,14 @@ const fetchSeries = (page = 1) => fetchFromTMDB("/tv/popular", { page });
 const fetchKidsMovies = (page = 1) => {
   const params = {
     // Using a comma here means: Animation AND Family
-    with_genres: "16,10751",
+    with_genres: "16|10751",
     certification_country: "US",
     "certification.lte": "PG",
     // Explicitly exclude Horror, Thriller, and Crime
     without_genres: "27,53,80",
     include_adult: false,
     sort_by: "popularity.desc",
+    page,
   };
 
   // DEBUG: Check your terminal to see if these params are actually being used!

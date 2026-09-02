@@ -1,6 +1,82 @@
-.movie-grid {
+.kids-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #0d0d0d;
+}
+
+.kids-movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 30px 22px;
+  padding: 20px 18px 50px;
+}
+
+/* Loading more */
+
+.loading-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #aaa;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #333;
+  border-top: 3px solid #e50914;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-more p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* End message */
+
+.end-message {
+  text-align: center;
+  color: #777;
+  padding: 30px;
+  font-size: 14px;
+}
+
+/* Tablet */
+
+@media (max-width: 1200px) {
+  .kids-movie-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .kids-movie-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .kids-movie-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px 12px;
+  }
+}
+
+@media (max-width: 450px) {
+  .kids-movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 12px;
+    padding: 15px 12px 40px;
+  }
 }

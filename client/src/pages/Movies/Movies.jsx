@@ -91,6 +91,7 @@ function Movies() {
     <div className="movies-page">
       <main className="main-content">
         <h1 className="section-title">Movies</h1>
+        <h2 className="browse-title">Browse by Genre</h2>
 
         {/* GENRE FILTERS */}
         <div className="genre-filters">

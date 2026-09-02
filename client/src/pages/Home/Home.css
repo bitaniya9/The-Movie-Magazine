@@ -102,7 +102,7 @@ html {
 
 /* Grid & Cards */
 .main-content {
-  padding: 1.2rem 1.2rem;
+  padding: 1rem 1.2rem;
 }
 .rating-badge {
   position: absolute;
@@ -219,16 +219,18 @@ h3 {
   font-size: 0.8rem;
 }
 .category-section {
-  padding: 20px 0%;
+  margin-left: 0;
+  padding: 10px 0%;
   overflow: hidden; /* Adds space on top/bottom and aligns with Hero */
 }
 
 .category-section h3 {
+  margin-left: 0;
   margin-bottom: 20px;
   font-size: 1.5rem;
   color: white;
   border-left: 4px solid #e50914; /* Optional: adds a nice red stripe to headers */
-  padding-left: 15px;
+  padding-left: 10px;
 }
 /* 1. The Container: Hide for Firefox and IE/Edge */
 .movie-grid {

@@ -344,7 +344,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
               className={page === "KidsShow" ? "active" : ""}
               onClick={() => handleMobileNavigation("KidsShow")}
             >
-              Kids
+              Family
             </Link>
           </li>
         </ul>

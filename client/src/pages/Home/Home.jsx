@@ -167,7 +167,7 @@ const Home = () => {
         ================================= */}
 
         <section className="category-section">
-          <h3>Kids & Family</h3>
+          <h3>Family</h3>
 
           <div className="movie-grid">
             {kids.map((movie) => (
