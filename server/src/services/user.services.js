@@ -64,21 +64,62 @@ class UserService {
     };
   }
 
-  async addToWatchList(userId, movieId) {
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { watchlist: movieId } },
-      { returnDocument: "after" },
-    ).populate("watchlist");
+  async toogleFavorite(userId, movieId) {
+    const user = await User.findById(userId);
 
-    if (!updatedUser) {
+    if (!user) {
       throw new Error("User not found");
     }
-    return updatedUser.watchlist;
+
+    const isFavorite = user.favorites.some(
+      (id) => id.toString() === movieId.toString(),
+    );
+
+    if (isFavorite) {
+      user.favorites = user.favorites.filter(
+        (id) => id.toString() !== movieId.toString(),
+      );
+    } else {
+      user.favorites.push(movieId);
+    }
+    await user.save();
+
+    return {
+      isFavorite: !isFavorite,
+      favorites: user.favorites,
+    };
+  }
+
+  async toggleWatchList(userId, movieId) {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error("user not found");
+    }
+
+    const inWatchlist = user.watchlist.some(
+      (id) => id.toString() === movieId.toString(),
+    );
+
+    if (inWatchlist) {
+      user.watchlist = user.watchlist.filter(
+        (id) => id.toString() !== movieId.toString(),
+      );
+    } else {
+      user.watchlist.push(movieId);
+    }
+
+    await user.save();
+
+    return {
+      inWatchlist: !inWatchlist,
+      watchlist: user.watchlist,
+    };
   }
   async getProfile(userId) {
     const user = await User.findById(userId)
       .populate("watchlist")
+      .populate("favorites")
       .select("-password")
       .select("-role");
     if (!user) {

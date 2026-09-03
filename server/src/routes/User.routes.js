@@ -4,10 +4,16 @@ const express = require("express");
 const router = express.Router();
 router.post("/v1/users/signin", UserController.signUp);
 router.post("/v1/users/login", UserController.login);
-router.post(
+router.get("/v1/users/profile", authMiddleware, UserController.getProfile);
+router.put(
   "/v1/users/watchlist",
   authMiddleware,
-  UserController.handleAddWatchlist,
+  UserController.handleToggleWatchlist,
 );
-router.get("/v1/users/profile", authMiddleware, UserController.getProfile);
+router.put(
+  "/v1/users/favorites",
+  authMiddleware,
+  UserController.handleToggleFavorite,
+);
+
 module.exports = router;

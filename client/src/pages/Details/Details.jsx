@@ -8,6 +8,8 @@ import {
   updateReview,
   deleteReview,
   fetchUserInfo,
+  toggleFavorite,
+  toggleWatchlist,
 } from "../../services/api";
 import "./Details.css";
 
@@ -37,6 +39,11 @@ const Details = () => {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [myReview, setMyReview] = useState(null);
+
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
 
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState("");
@@ -88,6 +95,25 @@ const Details = () => {
       return null;
     }
   };
+
+  useEffect(() => {
+    if (!movie || !currentUser) {
+      setIsFavorite(false);
+      setInWatchlist(false);
+      return;
+    }
+
+    const favoriteExists = currentUser.favorites?.some(
+      (favorite) => String(favorite._id || favorite) === String(movie._id),
+    );
+
+    const watchlistExists = currentUser.watchlist?.some(
+      (item) => String(item._id || item) === String(movie._id),
+    );
+
+    setIsFavorite(!!favoriteExists);
+    setInWatchlist(!!watchlistExists);
+  }, [movie, currentUser]);
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -168,6 +194,68 @@ const Details = () => {
 
   if (!movie) return <div className="loading">Loading movie details...</div>;
 
+  const handleWatchlist = async () => {
+    if (!currentUser) {
+      alert("Please log in to add movies to your watchlist.");
+      return;
+    }
+
+    try {
+      setWatchlistLoading(true);
+
+      const result = await toggleWatchlist(movie._id);
+
+      setInWatchlist(result.inWatchlist);
+
+      // Update current user too
+      setCurrentUser((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          watchlist: result.watchlist,
+        };
+      });
+    } catch (error) {
+      console.error("Watchlist error:", error);
+
+      alert(error.response?.data?.message || "Could not update watchlist.");
+    } finally {
+      setWatchlistLoading(false);
+    }
+  };
+
+  const handleFavorite = async () => {
+    if (!currentUser) {
+      alert("Please log in to add favorites.");
+      return;
+    }
+
+    try {
+      setFavoriteLoading(true);
+
+      const result = await toggleFavorite(movie._id);
+
+      setIsFavorite(result.isFavorite);
+
+      // Update current user too
+      setCurrentUser((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          favorites: result.favorites,
+        };
+      });
+    } catch (error) {
+      console.error("Favorite error:", error);
+
+      alert(error.response?.data?.message || "Could not update favorites.");
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
   return (
     <div className="details-page">
       <div className="details-container">
@@ -192,10 +280,36 @@ const Details = () => {
             </p>
           </div>
           <div className="buttons">
-            <button className="watchlist-btn">+ Add to Watchlist</button>
-            <button className="favorite-btn">
-              <Heart color="#e50914" fill="red" strokeWidth={1.0} />{" "}
-              <span>Add to Favorites</span>
+            <button
+              className={`watchlist-btn ${inWatchlist ? "active" : ""}`}
+              onClick={handleWatchlist}
+              disabled={watchlistLoading}
+            >
+              {watchlistLoading
+                ? "Updating..."
+                : inWatchlist
+                  ? "✓ In Watchlist"
+                  : "+ Add to Watchlist"}
+            </button>
+
+            <button
+              className={`favorite-btn ${isFavorite ? "active" : ""}`}
+              onClick={handleFavorite}
+              disabled={favoriteLoading}
+            >
+              <Heart
+                color="#e50914"
+                fill={isFavorite ? "#e50914" : "none"}
+                strokeWidth={1.5}
+              />
+
+              <span>
+                {favoriteLoading
+                  ? "Updating..."
+                  : isFavorite
+                    ? "Remove from Favorites"
+                    : "Add to Favorites"}
+              </span>
             </button>
           </div>
         </div>

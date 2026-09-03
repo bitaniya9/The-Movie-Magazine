@@ -13,22 +13,33 @@ const Profile = () => {
       try {
         const data = await fetchUserInfo();
 
-        setUser(data.profile || data);
+        // Handles either:
+        // { profile: {...} }
+        // { data: {...} }
+        // or directly { ...user }
+        const profile = data?.profile || data?.data || data;
+
+        setUser(profile);
       } catch (error) {
         console.error("Error loading user profile:", error.message);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
+
     loadUserInfo();
   }, []);
 
-  if (loading) return <div className="loading">Loading Profile...</div>;
+  if (loading) {
+    return <div className="loading">Loading Profile...</div>;
+  }
 
   if (!user) {
     return (
       <div className="error-container">
         <p>Could not load profile. Please log in again.</p>
+
         <button onClick={() => (window.location.href = "/")}>Go Home</button>
       </div>
     );
@@ -36,30 +47,40 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      {/* PROFILE HEADER */}
       <header className="profile-header">
         <div className="profile-info-row">
           <img
-            src={user.avatar || "../public/assets/new_favicon.png"}
+            src={user.image || "/assets/new_favicon.png"}
             alt="Avatar"
             className="profile-avatar"
           />
         </div>
+
         <div className="profile-text">
           <h1>{user.name}</h1>
+
           <div className="profile-meta">
-            <span>{user.watchlist?.length || 0}</span>
-            <span className="dot">.</span>
+            <span>{user.watchlist?.length || 0} movies</span>
+
+            <span className="dot">•</span>
+
             <span>
               Joined{" "}
-              {new Date(user.createdAt).toLocaleDateString("en-US", {
-                month: "long",
-                year: "numeric",
-              })}{" "}
+              {user.createdAt
+                ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "Recently"}
             </span>
           </div>
         </div>
+
         <button className="edit-btn">Edit profile</button>
       </header>
+
+      {/* PROFILE TABS */}
       <nav className="profile-nav">
         {["Watchlist", "Activity", "Favorites"].map((tab) => (
           <button
@@ -71,8 +92,10 @@ const Profile = () => {
           </button>
         ))}
       </nav>
-      {/* 3. Conditional Content Rendering */}
+
+      {/* PROFILE CONTENT */}
       <main className="profile-content">
+        {/* WATCHLIST */}
         {currTab === "Watchlist" && (
           <div className="movie-grid">
             {user.watchlist?.length > 0 ? (
@@ -85,15 +108,23 @@ const Profile = () => {
           </div>
         )}
 
+        {/* ACTIVITY */}
         {currTab === "Activity" && (
           <div className="activity-feed">
             <p className="empty-msg">No recent activity to show.</p>
           </div>
         )}
 
+        {/* FAVORITES */}
         {currTab === "Favorites" && (
           <div className="movie-grid">
-            <p className="empty-msg">You haven't marked any favorites yet.</p>
+            {user.favorites?.length > 0 ? (
+              user.favorites.map((movie) => (
+                <MovieCard key={movie._id} movie={movie} />
+              ))
+            ) : (
+              <p className="empty-msg">You haven't marked any favorites yet.</p>
+            )}
           </div>
         )}
       </main>

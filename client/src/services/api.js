@@ -139,3 +139,33 @@ export const fetchMoviesByGenre = async (genreId, page = 1) => {
     };
   }
 };
+
+export const toggleFavorite = async (movieId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.put(
+    "/users/favorites",
+    { movieId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+};
+
+export const toggleWatchlist = async (movieId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await API.put(
+    "/users/watchlist",
+    { movieId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+};

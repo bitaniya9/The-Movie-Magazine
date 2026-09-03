@@ -1,8 +1,8 @@
-const { email } = require("zod");
-const User = require("../models/User");
+// const { email } = require("zod");
+// const User = require("../models/User");
 const UserService = require("../services/user.services");
 const { signUpSchema, loginSchema } = require("../validator/user.validator");
-const { response } = require("express");
+// const { response } = require("express");
 class UserController {
   async signUp(request, response) {
     try {
@@ -22,16 +22,36 @@ class UserController {
       response.status(401).json({ message: error.message });
     }
   }
-  async handleAddWatchlist(request, response) {
+  async handleToggleWatchlist(request, response) {
     try {
       const { movieId } = request.body;
       const userId = request.user.userId;
-      const watchlist = await UserService.addToWatchList(userId, movieId);
-      response.status(200).json(watchlist);
+
+      const result = await UserService.toggleWatchList(userId, movieId);
+
+      response.status(200).json(result);
     } catch (error) {
       response.status(400).json({ message: error.message });
     }
   }
+
+  async handleToggleFavorite(request, response) {
+    try {
+      const { movieId } = request.body;
+
+      const userId = request.user.userId;
+
+      const result = await UserService.toogleFavorite(userId, movieId);
+
+      response.status(200).json(result);
+    } catch (error) {
+      console.error("Favorite error:", error);
+      response.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+
   async getProfile(request, response) {
     try {
       const { userId } = request.user;
