@@ -155,6 +155,22 @@ export const toggleFavorite = async (movieId) => {
   return response.data;
 };
 
+export const getTmdbMovieReviews = async (tmdbId, page = 1) => {
+  const response = await API.get(`/tmdb-reviews/movie/${tmdbId}`, {
+    params: { page },
+  });
+
+  return response.data;
+};
+
+export const getTmdbTVReviews = async (tmdbId, page = 1) => {
+  const response = await API.get(`/tmdb-reviews/tv/${tmdbId}`, {
+    params: { page },
+  });
+
+  return response.data;
+};
+
 export const toggleWatchlist = async (movieId) => {
   const token = localStorage.getItem("token");
 

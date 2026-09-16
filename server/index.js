@@ -4,6 +4,7 @@ const connectDB = require("./src/config/db");
 const UserRoutes = require("./src/routes/User.routes");
 const MovieRoutes = require("./src/routes/movieRoutes");
 const ReviewRoutes = require("./src/routes/review.routes");
+const TmdbRoutes = require("./src/routes/tmdbRoutes");
 
 const cors = require("cors");
 // const API_KEY = process.env.TMDB_API_KEY;
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api", UserRoutes);
 app.use("/api", MovieRoutes);
 app.use("/api", ReviewRoutes);
+app.use("/api", TmdbRoutes);
 
 connectDB();
 

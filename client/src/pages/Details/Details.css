@@ -263,3 +263,46 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.tmdb-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tmdb-review-card {
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.tmdb-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.tmdb-pagination button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #333;
+  color: white;
+  margin-bottom: 40px;
+}
+
+.tmdb-pagination button:hover:not(:disabled) {
+  background: #555;
+}
+
+.tmdb-pagination button.active-page {
+  background: #e50914;
+  font-weight: bold;
+}
+
+.tmdb-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

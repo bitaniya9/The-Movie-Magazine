@@ -5,6 +5,8 @@ import {
   fetchMovieById,
   getReviews,
   postReview,
+  getTmdbMovieReviews,
+  getTmdbTVReviews,
   updateReview,
   deleteReview,
   fetchUserInfo,
@@ -36,6 +38,10 @@ const Details = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [tmdbReviews, setTmdbReviews] = useState([]);
+  const [tmdbPage, setTmdbPage] = useState(1);
+  const [tmdbTotalPages, setTmdbTotalPages] = useState(1);
+  const [tmdbReviewsLoading, setTmdbReviewsLoading] = useState(true);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [myReview, setMyReview] = useState(null);
@@ -67,6 +73,26 @@ const Details = () => {
     }
   };
 
+  const loadTmdbReviews = async (tmdbId, targetPage = 1) => {
+    setTmdbReviewsLoading(true);
+
+    try {
+      const result =
+        mediaType === "tv"
+          ? await getTmdbTVReviews(tmdbId, targetPage)
+          : await getTmdbMovieReviews(tmdbId, targetPage);
+
+      // Replace the reviews with the selected page
+      setTmdbReviews(result.results);
+      setTmdbPage(result.page);
+      setTmdbTotalPages(result.total_pages);
+    } catch (error) {
+      console.error("Error loading TMDB reviews:", error);
+    } finally {
+      setTmdbReviewsLoading(false);
+    }
+  };
+
   // Checks if the logged-in user already has a review on this movie,
   // regardless of which page of the list it'd fall on.
   const checkMyReview = async (movieObjId, user) => {
@@ -95,6 +121,12 @@ const Details = () => {
       return null;
     }
   };
+
+  useEffect(() => {
+    if (!movie?.tmdbId) return;
+
+    loadTmdbReviews(movie.tmdbId, 1, false);
+  }, [movie?.tmdbId, mediaType]);
 
   useEffect(() => {
     if (!movie || !currentUser) {
@@ -317,7 +349,73 @@ const Details = () => {
 
       {/* Reviews Section */}
       <div className="reviews-section">
-        <h2>Reviews</h2>
+        <h2>Community Reviews</h2>
+
+        <div className="tmdb-reviews-section">
+          <h2>TMDB Reviews</h2>
+
+          {tmdbReviewsLoading && tmdbReviews.length === 0 && (
+            <p>Loading TMDB reviews...</p>
+          )}
+
+          {!tmdbReviewsLoading && tmdbReviews.length === 0 && (
+            <p>No TMDB reviews available.</p>
+          )}
+
+          {tmdbReviews.map((review) => (
+            <div className="tmdb-review-card" key={review.id}>
+              <div className="tmdb-review-header">
+                <h4>{review.author || "Anonymous"}</h4>
+
+                {review.author_details?.rating != null && (
+                  <span>⭐ {review.author_details.rating}/10</span>
+                )}
+              </div>
+
+              <p className="review-date">{formatDate(review.created_at)}</p>
+
+              <p>{review.content}</p>
+
+              {review.url && (
+                <a href={review.url} target="_blank" rel="noopener noreferrer">
+                  Read on TMDB
+                </a>
+              )}
+            </div>
+          ))}
+
+          {tmdbTotalPages > 1 && (
+            <div className="tmdb-pagination">
+              <button
+                onClick={() => loadTmdbReviews(movie.tmdbId, tmdbPage - 1)}
+                disabled={tmdbPage === 1 || tmdbReviewsLoading}
+              >
+                Previous
+              </button>
+
+              {Array.from(
+                { length: tmdbTotalPages },
+                (_, index) => index + 1,
+              ).map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  className={tmdbPage === pageNumber ? "active-page" : ""}
+                  onClick={() => loadTmdbReviews(movie.tmdbId, pageNumber)}
+                  disabled={tmdbReviewsLoading}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+
+              <button
+                onClick={() => loadTmdbReviews(movie.tmdbId, tmdbPage + 1)}
+                disabled={tmdbPage === tmdbTotalPages || tmdbReviewsLoading}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Review Form */}
         <div className="review-form" ref={formRef}>

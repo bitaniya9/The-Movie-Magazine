@@ -80,6 +80,20 @@ const fetchTVDetails = async (tmdbId) => {
   return response.data;
 };
 
+const getMovieReviews = async (tmdbMovieId, page = 1) => {
+  return fetchFromTMDB(`/movie/${tmdbMovieId}/reviews`, {
+    language: "en-US",
+    page,
+  });
+};
+
+const getTVReviews = async (tmdbTvId, page = 1) => {
+  return fetchFromTMDB(`/tv/${tmdbTvId}/reviews`, {
+    language: "en-US",
+    page,
+  });
+};
+
 module.exports = {
   fetchTVDetails,
   fetchTrendingMovies,
@@ -92,4 +106,6 @@ module.exports = {
   discoverMoviesByGenre,
   fetchGenreList,
   fetchMovieDetails,
+  getMovieReviews,
+  getTVReviews,
 };

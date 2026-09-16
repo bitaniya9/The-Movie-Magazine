@@ -146,7 +146,7 @@ const Navbar = ({ setShowLogin, token, onLogout }) => {
         ========================================== */}
 
         <Link to="/" className="navbar-logo" onClick={() => setPage("Home")}>
-          <h1 className="title">Movie Info and Reviews</h1>
+          <h1 className="title">The Movie Magazine</h1>
         </Link>
 
         {/* ==========================================
