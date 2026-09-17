@@ -1,4 +1,4 @@
-# Movie Reviewing Website
+# The Movie Magazine
 
 ## Description
 
