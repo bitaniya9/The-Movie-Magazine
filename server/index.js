@@ -1,41 +1,57 @@
 require("dotenv").config();
+
 const express = require("express");
-const connectDB = require("./src/config/db");
+const cors = require("cors");
+
+const { connectDB } = require("./src/config/db");
+
 const UserRoutes = require("./src/routes/User.routes");
 const MovieRoutes = require("./src/routes/movieRoutes");
 const ReviewRoutes = require("./src/routes/review.routes");
 const TmdbRoutes = require("./src/routes/tmdbRoutes");
 
-const cors = require("cors");
-// const API_KEY = process.env.TMDB_API_KEY;
 const { syncAllMovies } = require("./src/services/movieService");
-// const cron = require("node-cron");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+
+// Routes
 app.use("/api", UserRoutes);
 app.use("/api", MovieRoutes);
 app.use("/api", ReviewRoutes);
 app.use("/api", TmdbRoutes);
 
-connectDB();
-
-// // Run immediately at startup
-syncAllMovies();
-
-// // Then schedule every 6 hours
-// cron.schedule("0 */6 * * *", async () => {
-//   console.log("Syncing movies every 6 hours...");
-//   await syncAllMovies();
-// });
-// console.log(API_KEY);
+// Home route
 app.get("/", (req, res) => {
   res.json({
     message: "Movie Review API is running",
   });
 });
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port: ${process.env.PORT}`);
-});
+
+// Start server after database connection
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    console.log("Database connection established.");
+
+    await syncAllMovies();
+
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port: ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+if (require.main === module) {
+  startServer();
+}
+
 module.exports = app;

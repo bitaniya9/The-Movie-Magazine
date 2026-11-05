@@ -1,26 +1,37 @@
 const ReviewServices = require("../services/review.services");
 
 class ReviewControllers {
+  // CREATE REVIEW
   async postReview(request, response) {
     try {
       const userId = request.user.userId || request.user.id || request.user._id;
+
       const reviewData = { ...request.body, userId };
+
       const newReview = await ReviewServices.postReview(reviewData);
-      response.status(201).json({ success: true, data: newReview });
+
+      response.status(201).json({
+        success: true,
+        data: newReview,
+      });
     } catch (error) {
       response.status(400).json({ message: error.message });
     }
   }
 
+  // GET REVIEWS
   async getReview(request, response) {
     try {
-      const { page = 1, limit = 7, movieId, userId } = request.query;
+      const { page = 1, limit = 7, movieId, userId, mediaType } = request.query;
+
       const reviews = await ReviewServices.getReviews(
         Number(page),
         Number(limit),
         movieId,
         userId,
+        mediaType,
       );
+
       response.status(200).json({
         success: true,
         data: reviews,
@@ -30,27 +41,41 @@ class ReviewControllers {
     }
   }
 
+  // UPDATE REVIEW
   async updateReview(request, response) {
     try {
       const userId = request.user.userId || request.user.id || request.user._id;
+
       const updatedReview = await ReviewServices.editReview(
         request.params.id,
         request.body,
         userId,
       );
-      response.status(200).json({ success: true, data: updatedReview });
+
+      response.status(200).json({
+        success: true,
+        data: updatedReview,
+      });
     } catch (error) {
       response.status(400).json({ message: error.message });
     }
   }
 
+  // DELETE REVIEW
   async deleteReview(request, response) {
     try {
       const userId = request.user.userId || request.user.id || request.user._id;
+
       await ReviewServices.deleteReview(request.params.id, userId);
-      response.status(200).json({ message: "Review deleted successfully" });
+
+      response.status(200).json({
+        message: "Review deleted successfully",
+      });
     } catch (error) {
-      response.status(400).json({ success: false, message: error.message });
+      response.status(400).json({
+        success: false,
+        message: error.message,
+      });
     }
   }
 }

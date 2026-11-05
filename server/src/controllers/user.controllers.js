@@ -22,12 +22,17 @@ class UserController {
       response.status(401).json({ message: error.message });
     }
   }
+
   async handleToggleWatchlist(request, response) {
     try {
-      const { movieId } = request.body;
+      const { movieId, mediaType = "movie" } = request.body;
       const userId = request.user.userId;
 
-      const result = await UserService.toggleWatchList(userId, movieId);
+      const result = await UserService.toggleWatchList(
+        userId,
+        movieId,
+        mediaType,
+      );
 
       response.status(200).json(result);
     } catch (error) {
@@ -37,18 +42,19 @@ class UserController {
 
   async handleToggleFavorite(request, response) {
     try {
-      const { movieId } = request.body;
-
+      const { movieId, mediaType = "movie" } = request.body;
       const userId = request.user.userId;
 
-      const result = await UserService.toogleFavorite(userId, movieId);
+      const result = await UserService.toogleFavorite(
+        userId,
+        movieId,
+        mediaType,
+      );
 
       response.status(200).json(result);
     } catch (error) {
       console.error("Favorite error:", error);
-      response.status(400).json({
-        message: error.message,
-      });
+      response.status(400).json({ message: error.message });
     }
   }
 

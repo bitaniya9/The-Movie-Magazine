@@ -1,24 +1,30 @@
-const mongoose = require("mongoose");
-const UserSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    image: { type: String },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-    watchlist: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Movie",
-      },
-    ],
-    favorites: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Movie",
-      },
-    ],
-  },
-  { timestamps: true },
-);
-module.exports = mongoose.model("User", UserSchema);
+const { pool } = require("../config/db");
+
+class User {
+  static async findByEmail(email) {
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+
+    return result.rows[0] || null;
+  }
+
+  static async findById(id) {
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+
+    return result.rows[0] || null;
+  }
+
+  static async create({ name, email, password, role = "user" }) {
+    const result = await pool.query(
+      `INSERT INTO users (name, email, password, role)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, image, role, created_at, updated_at`,
+      [name, email, password, role],
+    );
+
+    return result.rows[0];
+  }
+}
+
+module.exports = User;

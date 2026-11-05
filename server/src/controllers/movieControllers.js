@@ -3,12 +3,21 @@ const {
   fetchTopRatedMovies,
   fetchKidsMovies,
   fetchSeries,
-  fetchTVDetails,
   discoverMovies,
   discoverMoviesByGenre,
-  searchMovies: searchMoviesFromTMDB,
 } = require("../services/tmdbService");
-const { getMovieById } = require("../services/movieService");
+
+const {
+  getMovieById,
+  getDiscoverMovies,
+  searchMovies: searchMoviesFromService,
+  transformMovie,
+  saveMovies,
+} = require("../services/movieService");
+
+// ==========================================
+// GET MOVIES BY GENRE
+// ==========================================
 
 const getMoviesByGenre = async (req, res) => {
   try {
@@ -17,25 +26,17 @@ const getMoviesByGenre = async (req, res) => {
 
     const data = await discoverMoviesByGenre(genreId, page);
 
-    const transformed = (data.results || []).map((m) => ({
-      _id: m.id,
-      tmdbId: m.id,
-      title: m.title || "Untitled",
-      posterImgUrl: m.poster_path
-        ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-        : undefined,
-      releaseYear: (m.release_date || "").split("-")[0] || "N/A",
-      averageRating: m.vote_average,
-      description: m.overview,
-      category: ["Movies"],
-      mediaType: "movie",
-    }));
+    const transformed = (data.results || []).map((movie) =>
+      transformMovie(movie, "Movies", "movie"),
+    );
+
+    const savedMovies = await saveMovies(transformed);
 
     res.json({
       page: data.page,
       total_pages: data.total_pages,
       total_results: data.total_results,
-      results: transformed,
+      results: savedMovies,
     });
   } catch (error) {
     console.error("Genre Controller Error:", error.message);
@@ -46,53 +47,57 @@ const getMoviesByGenre = async (req, res) => {
   }
 };
 
+// ==========================================
+// GET ALL MOVIES
+// ==========================================
+
 const getAllMovies = async (req, res) => {
   try {
     const { category } = req.query;
     const page = Number(req.query.page) || 1;
-    let data;
 
-    // 1. Fetch from Service
+    let data;
+    let mediaType = "movie";
+    let categoryName = category || "Discover";
+
     if (category === "Trending") {
       data = await fetchTrendingMovies(page);
     } else if (category === "TopRated") {
       data = await fetchTopRatedMovies(page);
+      categoryName = "Top Rated";
     } else if (category === "Kids") {
       data = await fetchKidsMovies(page);
     } else if (category === "Series") {
       data = await fetchSeries(page);
+      mediaType = "tv";
     } else {
       data = await discoverMovies(page);
     }
 
-    const rawMovies = data.results || [];
+    const transformed = (data.results || []).map((movie) =>
+      transformMovie(movie, categoryName, mediaType),
+    );
 
-    // 2. Transform the data so React can read it easily
-    const transformed = rawMovies.map((m) => ({
-      _id: m.id,
-      title: m.title || m.name || "Untitled",
-      posterImgUrl: `https://image.tmdb.org/t/p/w500${m.poster_path}`,
-      releaseYear:
-        (m.release_date || m.first_air_date || "").split("-")[0] || "N/A",
-      averageRating: m.vote_average,
-      category: [category || "Discover"],
-      mediaType: category === "Series" ? "tv" : "movie",
-      description: m.overview,
-      tmdbId: m.id,
-    }));
+    const savedMovies = await saveMovies(transformed);
 
-    // 3. Send the clean data to the frontend
     res.json({
       page: data.page,
       total_pages: data.total_pages,
       total_results: data.total_results,
-      results: transformed,
+      results: savedMovies,
     });
   } catch (error) {
     console.error("Controller Error:", error.message);
-    res.status(500).json({ error: "Failed to fetch movies" });
+
+    res.status(500).json({
+      error: "Failed to fetch movies",
+    });
   }
 };
+
+// ==========================================
+// SEARCH MOVIES AND TV SERIES
+// ==========================================
 
 const searchMovies = async (req, res) => {
   try {
@@ -104,35 +109,10 @@ const searchMovies = async (req, res) => {
         error: "Search query is required",
       });
     }
-    const data = await searchMoviesFromTMDB(query.trim(), page);
 
-    const transformed = (data.results || [])
-      .filter((m) => m.media_type == "movie" || m.media_type === "tv")
-      .map((m) => ({
-        _id: m.id,
-        title: m.title || "Untitled",
-        posterImgUrl: m.poster_path
-          ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
-          : undefined,
+    const data = await searchMoviesFromService(query.trim(), page);
 
-        releaseYear: (m.release_date || "").split("-")[0] || "N/A",
-
-        averageRating: m.vote_average,
-
-        category: [m.media_type === "tv" ? "Series" : "Search"],
-
-        description: m.overview,
-
-        mediaType: m.media_type,
-        tmdbId: m.id,
-      }));
-
-    res.json({
-      page: data.page,
-      total_pages: data.total_pages,
-      total_results: data.total_results,
-      results: transformed,
-    });
+    res.json(data);
   } catch (error) {
     console.error("Search Controller Error:", error.message);
 
@@ -142,26 +122,35 @@ const searchMovies = async (req, res) => {
   }
 };
 
-const getMoviesById = async (request, response) => {
-  try {
-    const { id } = request.params;
-    const { type } = request.query;
+// ==========================================
+// GET MOVIE / TV DETAILS
+// ==========================================
 
+const getMoviesById = async (request, response) => {
+  const { id } = request.params;
+
+  try {
+    const { type } = request.query;
     const mediaType = type === "tv" ? "tv" : "movie";
+
     const movie = await getMovieById(id, mediaType);
+
     if (!movie) {
       return response.status(404).json({
         message: "Movie/TV not found",
       });
     }
+
     response.status(200).json({ movie });
   } catch (error) {
-    response.status(500).json({ message: error.message });
-    console.log("Searching for movie with TMDB ID:", id);
+    console.error("Movie Details Controller Error:", error.message);
+
+    response.status(500).json({
+      message: error.message,
+    });
   }
 };
 
-// 4. Export it so the Router can see it
 module.exports = {
   getAllMovies,
   searchMovies,
