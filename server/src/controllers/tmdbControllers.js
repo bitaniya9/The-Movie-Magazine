@@ -1,4 +1,5 @@
-const tmdbService = require("../services/tmdbService");
+
+const tmdbReviewService = require("../services/tmdbReviewService");
 
 class TmdbController {
   async getMovieReviews(request, response) {
@@ -6,11 +7,12 @@ class TmdbController {
       const { tmdbId } = request.params;
       const page = Number(request.query.page) || 1;
 
-      const reviews = await tmdbService.getMovieReviews(tmdbId, page);
+      const reviews =
+        await tmdbReviewService.getMovieReviewsFromTMDB(tmdbId, page);
 
       response.status(200).json(reviews);
     } catch (error) {
-      console.error("Error fetching TMDB movie reviews:", error.message);
+      console.error("Error fetching TMDB movie reviews:", error);
 
       response.status(500).json({
         message: "Failed to fetch TMDB movie reviews",
@@ -23,11 +25,12 @@ class TmdbController {
       const { tmdbId } = request.params;
       const page = Number(request.query.page) || 1;
 
-      const reviews = await tmdbService.getTVReviews(tmdbId, page);
+      const reviews =
+        await tmdbReviewService.getTVReviewsFromTMDB(tmdbId, page);
 
       response.status(200).json(reviews);
     } catch (error) {
-      console.error("Error fetching TMDB TV reviews:", error.message);
+      console.error("Error fetching TMDB TV reviews:", error);
 
       response.status(500).json({
         message: "Failed to fetch TMDB TV reviews",

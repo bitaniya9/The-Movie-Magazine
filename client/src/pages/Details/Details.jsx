@@ -128,6 +128,7 @@ const Details = () => {
     loadTmdbReviews(movie.tmdbId, 1, false);
   }, [movie?.tmdbId, mediaType]);
 
+  
   useEffect(() => {
     if (!movie || !currentUser) {
       setIsFavorite(false);
@@ -135,17 +136,33 @@ const Details = () => {
       return;
     }
 
-    const favoriteExists = currentUser.favorites?.some(
-      (favorite) => String(favorite._id || favorite) === String(movie._id),
-    );
+    const movieId = String(movie._id || movie.id || movie.tmdbId);
 
-    const watchlistExists = currentUser.watchlist?.some(
-      (item) => String(item._id || item) === String(movie._id),
-    );
+    const isSameMovie = (item) => {
+      const itemId =
+        typeof item === "object"
+          ? item.movieId ?? item._id ?? item.id ?? item.tmdbId
+          : item;
+
+      const itemMediaType =
+        typeof item === "object" ? item.mediaType : mediaType;
+
+      return (
+        String(itemId) === movieId &&
+        itemMediaType === mediaType
+      );
+    };
+
+    const favoriteExists =
+      currentUser.favorites?.some(isSameMovie);
+
+    const watchlistExists =
+      currentUser.watchlist?.some(isSameMovie);
 
     setIsFavorite(!!favoriteExists);
     setInWatchlist(!!watchlistExists);
-  }, [movie, currentUser]);
+  }, [movie, currentUser, mediaType]);
+
 
   useEffect(() => {
     const loadMovie = async () => {

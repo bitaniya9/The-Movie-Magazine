@@ -2,7 +2,7 @@
 
 ## Description
 
-A full stack movie review platform where users can browse movies,read reviews made on the page, submit their own review , add a favorites or add to watch list.The movie data is fetched from TMDB and synchronized into a MongoDB database.
+A full stack movie review platform where users can browse movies,read reviews made on the page, submit their own review , add a favorites or add to watch list.The movie data is fetched from TMDB and synchronized into a Postgresql database.
 
 ## Features
 
@@ -14,7 +14,7 @@ A full stack movie review platform where users can browse movies,read reviews ma
 - Submit ratings and reviews
 - Edit and delete reviews
 - RESTful API
-- MongoDB database
+- Postgresql database
 
 ## Tech Stack
 
@@ -23,7 +23,7 @@ A full stack movie review platform where users can browse movies,read reviews ma
 - Node.js
 - Express.js
 - bcrypt
-- MongoDB
+- Postgresql
 - JWT
 
 ### Frontend
