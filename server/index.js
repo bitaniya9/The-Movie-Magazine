@@ -15,11 +15,13 @@ const { syncAllMovies } = require("./src/services/movieService");
 const app = express();
 
 
+const cors = require("cors");
+
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://movie-review-client-six.vercel.app/"
+      "https://movie-review-client-six.vercel.app"
     ],
     credentials: true
   })
