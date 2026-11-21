@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -14,9 +15,7 @@ const { syncAllMovies } = require("./src/services/movieService");
 
 const app = express();
 
-
-const cors = require("cors");
-
+// CORS configuration
 app.use(
   cors({
     origin: [
@@ -26,6 +25,7 @@ app.use(
     credentials: true
   })
 );
+
 app.use(express.json());
 
 // Routes
